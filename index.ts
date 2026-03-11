@@ -14,6 +14,9 @@ const port = 3000;
 
 connectDB();
 
+// Cho phép gửi data lên dạng json
+app.use(express.json());
+
 // Thiết lập thư mục view và view engine pug
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug"); // Thiết lập Pug làm view engine
