@@ -19,4 +19,15 @@ router.post(
   articleController.createCategoryPost
 );
 
+
+router.get('/category/edit/:id', articleController.editCategory);
+
+router.patch(
+  '/category/edit/:id', 
+  upload.none(), 
+  articleValidate.createCategoryPost, 
+  articleController.editCategoryPatch
+);
+
+
 export default router;
