@@ -1,3 +1,16 @@
+// Khởi tạo TinyMCE
+const initialTinyMCE = () => {
+  tinymce.init({
+    selector: '[textarea-mce]',
+    plugins: [
+      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount', 'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'uploadcare', 'mentions', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+    ],
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+  });
+}
+initialTinyMCE();
+// Hết Khởi tạo TinyMCE
+
 // Create an instance of Notyf
 var notyf = new Notyf({
   duration: 3000,
@@ -54,7 +67,7 @@ if (articleCreateCategoryForm) {
       const slug = event.target.slug.value;
       const parent = event.target.parent.value;
       const status = event.target.status.value;
-      const description = event.target.description.value;
+      const description = tinymce.get("description").getContent();
 
       // Tạo formData
       const formData = new FormData();
