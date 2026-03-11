@@ -1,13 +1,49 @@
 // Khởi tạo TinyMCE
 const initialTinyMCE = () => {
   tinymce.init({
-    selector: '[textarea-mce]',
+    selector: "[textarea-mce]",
     plugins: [
-      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount', 'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'uploadcare', 'mentions', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+      "anchor",
+      "autolink",
+      "charmap",
+      "codesample",
+      "emoticons",
+      "link",
+      "lists",
+      "media",
+      "searchreplace",
+      "table",
+      "visualblocks",
+      "wordcount",
+      "checklist",
+      "mediaembed",
+      "casechange",
+      "formatpainter",
+      "pageembed",
+      "a11ychecker",
+      "tinymcespellchecker",
+      "permanentpen",
+      "powerpaste",
+      "advtable",
+      "advcode",
+      "advtemplate",
+      "uploadcare",
+      "mentions",
+      "tableofcontents",
+      "footnotes",
+      "mergetags",
+      "autocorrect",
+      "typography",
+      "inlinecss",
+      "markdown",
+      "importword",
+      "exportword",
+      "exportpdf",
     ],
-    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    toolbar:
+      "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat",
   });
-}
+};
 initialTinyMCE();
 // Hết Khởi tạo TinyMCE
 
@@ -131,23 +167,24 @@ if (buttonGenerateSlug) {
 }
 // End btn-generate-slug
 
-
 // articleEditCategoryForm
-const articleEditCategoryForm = document.querySelector("#articleEditCategoryForm");
-if(articleEditCategoryForm) {
-  const validator = new JustValidate('#articleEditCategoryForm');
+const articleEditCategoryForm = document.querySelector(
+  "#articleEditCategoryForm",
+);
+if (articleEditCategoryForm) {
+  const validator = new JustValidate("#articleEditCategoryForm");
 
   validator
-    .addField('#name', [
+    .addField("#name", [
       {
-        rule: 'required',
-        errorMessage: 'Vui lòng nhập tên danh mục!',
+        rule: "required",
+        errorMessage: "Vui lòng nhập tên danh mục!",
       },
     ])
-    .addField('#slug', [
+    .addField("#slug", [
       {
-        rule: 'required',
-        errorMessage: 'Vui lòng nhập đường dẫn!',
+        rule: "required",
+        errorMessage: "Vui lòng nhập đường dẫn!",
       },
     ])
     .onSuccess((event) => {
@@ -168,46 +205,69 @@ if(articleEditCategoryForm) {
 
       fetch(`/${pathAdmin}/article/category/edit/${id}`, {
         method: "PATCH",
-        body: formData
+        body: formData,
       })
-        .then(res => res.json())
-        .then(data => {
-          if(data.code == "error") {
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.code == "error") {
             notyf.error(data.message);
           }
 
-          if(data.code == "success") {
+          if (data.code == "success") {
             notyf.success(data.message);
           }
-        })
+        });
     });
 }
 // End articleEditCategoryForm
 
-
 // button-api
 const listButtonApi = document.querySelectorAll("[button-api]");
-if(listButtonApi.length > 0) {
-  listButtonApi.forEach(button => {
+if (listButtonApi.length > 0) {
+  listButtonApi.forEach((button) => {
     button.addEventListener("click", () => {
       const method = button.getAttribute("data-method");
       const api = button.getAttribute("data-api");
 
       fetch(api, {
-        method: method || "GET"
+        method: method || "GET",
       })
-        .then(res => res.json())
-        .then(data => {
-          if(data.code == "error") {
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.code == "error") {
             notyf.error(data.message);
           }
 
-          if(data.code == "success") {
+          if (data.code == "success") {
             drawNotify(data.code, data.message);
             location.reload();
           }
-        })
-    })
-  })
+        });
+    });
+  });
 }
 // End button-api
+
+// form-search
+const formSearch = document.querySelector("[form-search]");
+if (formSearch) {
+  const url = new URL(window.location.href);
+
+  formSearch.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const value = event.target.keyword.value;
+    if (value) {
+      url.searchParams.set("keyword", value);
+    } else {
+      url.searchParams.delete("keyword");
+    }
+    window.location.href = url.href;
+  });
+
+  // Hiển thị giá trị mặc định
+  const valueCurrent = url.searchParams.get("keyword");
+  if (valueCurrent) {
+    formSearch.keyword.value = valueCurrent;
+  }
+}
+// End form-search
