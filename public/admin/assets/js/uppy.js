@@ -1,5 +1,9 @@
 import { Uppy, Dashboard, XHRUpload } from "https://releases.transloadit.com/uppy/v4.18.2/uppy.min.mjs"
 
+
+const uppuUpload = document.querySelector("#uppy-upload");
+if(uppuUpload) {
+
 const uppy = new Uppy()
 
 uppy.use(Dashboard, {
@@ -13,13 +17,10 @@ uppy.use(XHRUpload, {
   fieldName: "files",
   bundle: true
 })
+ uppy.on('upload-success', (file, response) => {
+    const res = response.body;
+    drawNotify(res.code, res.message)
 
-uppy.on('complete', (result) => {
-	if(result.successful.length > 0) {
-    drawNotify("success", `Upload thành công ${result.successful.length} file`);
-  }
-  if(result.failed.length > 0) {
-    drawNotify("error", `Upload lỗi ${result.successful.length} file`);
-  }
   window.location.reload();
 });
+}
