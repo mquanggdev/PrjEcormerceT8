@@ -3,7 +3,7 @@ import path from "path";
 import dotenv from "dotenv";
 import adminRoutes from "./routes/admin/index.route";
 import clientRoutes from "./routes/client/index.route";
-import { pathAdmin } from "./configs/variable.config";
+import { domainCDN,pathAdmin } from "./configs/variable.config";
 import { connectDB } from "./configs/database.config";
 
 // Load biến môi trường
@@ -46,6 +46,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Tạo biến toàn cục trong file PUG
 app.locals.pathAdmin = pathAdmin;
+app.locals.domainCDN = domainCDN;
 
 app.use("/", clientRoutes);
 app.use(`/${pathAdmin}`, adminRoutes);
