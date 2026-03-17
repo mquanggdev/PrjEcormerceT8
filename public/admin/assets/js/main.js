@@ -272,40 +272,92 @@ if (formSearch) {
 }
 // End form-search
 
-
 // pagination
 const pagination = document.querySelector("[pagination]");
-if(pagination) {
+if (pagination) {
   const url = new URL(window.location.href);
 
   pagination.addEventListener("change", () => {
     const value = pagination.value;
-    if(value) {
+    if (value) {
       url.searchParams.set("page", value);
     } else {
       url.searchParams.delete("page");
     }
     window.location.href = url.href;
-  })
+  });
 
   // Hiển thị giá trị mặc định
   const valueCurrent = url.searchParams.get("page");
-  if(valueCurrent) {
+  if (valueCurrent) {
     pagination.value = valueCurrent;
   }
 }
 // End pagination
 
-
 // button-copy
 const listButtonCopy = document.querySelectorAll("[button-copy]");
-if(listButtonCopy.length > 0) {
-  listButtonCopy.forEach(button => {
+if (listButtonCopy.length > 0) {
+  listButtonCopy.forEach((button) => {
     button.addEventListener("click", () => {
       const content = button.getAttribute("data-content");
       window.navigator.clipboard.writeText(content);
       notyf.success("Đã copy!");
-    })
-  })
+    });
+  });
 }
 // End button-copy
+
+// Modal Preview File
+const modalPreviewFile = document.querySelector("#modalPreviewFile");
+if (modalPreviewFile) {
+  const innerPreview = modalPreviewFile.querySelector(".inner-preview");
+
+  // Sự kiện click button
+  let buttonClicked = null;
+
+  const listButtonPreviewFile = document.querySelectorAll(
+    "[button-preview-file]",
+  );
+  listButtonPreviewFile.forEach((button) => {
+    button.addEventListener("click", () => {
+      buttonClicked = button;
+    });
+  });
+
+  // Sự kiện đóng modal
+  modalPreviewFile.addEventListener("hidden.bs.modal", (event) => {
+    buttonClicked = null;
+    innerPreview.innerHTML = "";
+  });
+
+  // Sự kiện mở modal
+  modalPreviewFile.addEventListener("shown.bs.modal", (event) => {
+    const file = buttonClicked.getAttribute("data-file");
+    const mimetype = buttonClicked.getAttribute("data-mimetype");
+
+    // Nếu là file ảnh
+    if (mimetype.includes("image")) {
+      innerPreview.innerHTML = `
+        <img src="${file}" width="100%" />
+      `;
+    } else if (mimetype.includes("audio")) {
+      innerPreview.innerHTML = `
+        <audio controls>
+          <source src="${file}" />
+        </audio>
+      `;
+    } else if (mimetype.includes("video")) {
+      innerPreview.innerHTML = `
+        <video controls width="100%">
+          <source src="${file}" />
+        </video>
+      `;
+    } else if (mimetype.includes("application/pdf")) {
+      innerPreview.innerHTML = `
+        <iframe src="${file}" width="100%" height="600px"></iframe>
+      `;
+    }
+  });
+}
+// End Modal Preview File
