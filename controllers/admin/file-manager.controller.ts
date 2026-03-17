@@ -84,3 +84,63 @@ export const uploadPost = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const changeFileNamePatch = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const newFileName = req.body.fileName;
+
+    const record = await Media.findOne({
+      _id: id,
+    });
+
+    if (!record) {
+      res.json({
+        code: "error",
+        message: "Không tìm thấy file!",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("folder", record.folder);
+    formData.append("oldFileName", record.filename);
+    formData.append("newFileName", newFileName);
+
+    const response = await axios.patch(
+      `${domainCDN}/file-manager/change-file-name`,
+      formData,
+      {
+        headers: formData.getHeaders(),
+      },
+    );
+
+    if (response.data.code == "error") {
+      res.json({
+        code: "error",
+        message: response.data.message,
+      });
+      return;
+    }
+
+    // Cập nhật lại trường filename trong CSDL
+    await Media.updateOne(
+      {
+        _id: id,
+      },
+      {
+        filename: newFileName,
+      },
+    );
+
+    res.json({
+      code: "success",
+      message: "Đã đổi tên file!",
+    });
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Không tìm thấy file!",
+    });
+  }
+};

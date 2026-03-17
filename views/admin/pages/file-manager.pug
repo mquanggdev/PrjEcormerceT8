@@ -60,7 +60,15 @@ block main
                     i.las.la-eye.text-secondary.fs-18.ms-1
                   a(href=`${domainCDN}${item.folder}/${item.filename}?type=download`)
                     i.las.la-download.text-secondary.fs-18.ms-1
-                  a(href="#")
+                  a(
+                    href="javascript:;"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalChangeFileName"
+                    button-change-file-name
+                    data-file-name=item.filename
+                    data-file-id=item.id
+                    )
+
                     i.las.la-pen.text-secondary.fs-18.ms-1
                   a( href="#")
                     i.las.la-trash-alt.text-secondary.fs-18.ms-1
@@ -96,3 +104,27 @@ block main
         .modal-body
           .inner-preview
   //- End Modal Preview File
+  //- Modal Change File Name
+  #modalChangeFileName.modal.fade(
+    aria-hidden="true" 
+    tabindex="-1"
+    )
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          h1.modal-title.fs-5 Đổi tên file
+          button.btn-close(
+            aria-label="Close" 
+            data-bs-dismiss="modal" 
+            type="button"
+            )
+        .modal-body
+          form(action="")
+            .mb-3.d-none
+              label(class="form-label") Id
+              input(type="text" class="form-control" name="fileId")
+            .mb-3
+              label(class="form-label") Tên file
+              input(type="text" class="form-control" name="fileName")
+            button.btn.btn-primary(type="submit") Cập nhật
+  //- End Modal Change File Name

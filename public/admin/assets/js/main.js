@@ -361,3 +361,65 @@ if (modalPreviewFile) {
   });
 }
 // End Modal Preview File
+
+// Modal Change File Name
+const modalChangeFileName = document.querySelector("#modalChangeFileName");
+if(modalChangeFileName) {
+  const form = modalChangeFileName.querySelector("form");
+
+  // Sự kiện click button
+  let buttonClicked = null;
+
+  const listButtonChangeFileName = document.querySelectorAll("[button-change-file-name]");
+  listButtonChangeFileName.forEach(button => {
+    button.addEventListener("click", () => {
+      buttonClicked = button;
+    })
+  })
+
+  // Sự kiện đóng modal
+  modalChangeFileName.addEventListener('hidden.bs.modal', event => {
+    buttonClicked = null;
+    form.fileId.value = "";
+    form.fileName.value = "";
+  })
+
+  // Sự kiện mở modal
+  modalChangeFileName.addEventListener('shown.bs.modal', event => {
+    const fileId = buttonClicked.getAttribute("data-file-id");
+    const fileName = buttonClicked.getAttribute("data-file-name");
+    form.fileId.value = fileId;
+    form.fileName.value = fileName;
+  })
+
+  // Sự kiện submit form
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const fileId = form.fileId.value;
+    const fileName = form.fileName.value;
+
+    if(fileId && fileName) {
+      // Tạo formData
+      const formData = new FormData();
+      formData.append("fileName", fileName);
+
+      fetch(`/${pathAdmin}/file-manager/change-file-name/${fileId}`, {
+        method: "PATCH",
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          if(data.code == "error") {
+            notyf.error(data.message);
+          }
+
+          if(data.code == "success") {
+            drawNotify(data.code, data.message);
+            location.reload();
+          }
+        })
+    }
+  })
+}
+// End Modal Change File Name
