@@ -36,11 +36,23 @@ export const fileManager = async (req: Request, res: Response) => {
     item.createdAtFormat = moment(item.createdAt).format("HH:mm - DD/MM/YYYY");
     item.sizeFormat = formatFileSize(item.size);
   }
+    // Danh sách folder
+  let folderList = [];
+  const response = await axios.get(`${domainCDN}/file-manager/folder/list`);
+  if(response.data.code == "success") {
+    folderList = response.data.folderList;
+    for (const item of folderList) {
+      item.createdAtFormat = moment(item.createdAt).format("HH:mm - DD/MM/YYYY");
+    }
+  }
+  // Hết Danh sách folder
+
 
   res.render("admin/pages/file-manager", {
     pageTitle: "Quản lý file",
     listFile: listFile,
     pagination: pagination,
+    folderList: folderList
   });
 };
 
@@ -194,3 +206,42 @@ export const deleteFileDel = async (req: Request, res: Response) => {
     })
   }
 }
+export const createFolderPost = async (req: Request, res: Response) => {
+  try {
+    const { folderName } = req.body;
+
+    if(!folderName) {
+      res.json({
+        code: "error",
+        message: "Vui lòng gửi kèm tên folder!"
+      })
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("folderName", folderName);
+
+    const response = await axios.post(`${domainCDN}/file-manager/folder/create`, formData, {
+      headers: formData.getHeaders()
+    });
+
+    if(response.data.code == "error") {
+      res.json({
+        code: "error",
+        message: response.data.message
+      })
+      return;
+    }
+
+    res.json({
+      code: "success",
+      message: "Đã tạo folder!"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+ 

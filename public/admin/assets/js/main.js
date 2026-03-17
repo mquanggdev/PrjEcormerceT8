@@ -452,3 +452,36 @@ if(listButtonDeleteFile.length > 0) {
   })
 }
 // End Button Delete File
+// Form Create Folder
+const formCreateFolder = document.querySelector("[form-create-folder]");
+if(formCreateFolder) {
+  formCreateFolder.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const folderName = event.target.folderName.value;
+    if(!folderName) {
+      notyf.error("Vui lòng nhập tên folder");
+      return;
+    }
+
+    // Tạo formData
+    const formData = new FormData();
+    formData.append("folderName", folderName);
+
+    fetch(`/${pathAdmin}/file-manager/folder/create`, {
+      method: "POST",
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        if(data.code == "error") {
+          notyf.error(data.message);
+        }
+
+        if(data.code == "success") {
+          drawNotify(data.code, data.message);
+          location.reload();
+        }
+      })
+  })
+}
+// End Form Create Folder
