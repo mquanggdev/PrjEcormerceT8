@@ -32,8 +32,12 @@ block main
           tbody
             each item in folderList
               tr
-                td
-                  a(href="#") 
+                td      
+                  a(
+                    href="javascript:;"
+                    button-to-folder
+                    data-folder-path=item.name
+                    )  
                     .d-inline-flex.justify-content-center.align-items-center.thumb-md.bg-secondary-subtle.rounded.mx-auto.me-1
                       i.fa-solid.fa-folder.fs-18.align-self-center.mb-0.text-secondary
                     span #{item.name}

@@ -9,6 +9,16 @@ import { formatFileSize } from "../../helpers/format.helper";
 import { domainCDN } from "../../configs/variable.config";
 
 export const fileManager = async (req: Request, res: Response) => {
+  
+  const find: {
+    folder?: string
+  } = {};
+
+  find.folder = "/media";
+  if(req.query.folderPath) {
+    find.folder = find.folder + `/${req.query.folderPath}`;
+  }
+
   // Phân trang
   const limitItems = 20;
   let page = 1;
@@ -25,7 +35,7 @@ export const fileManager = async (req: Request, res: Response) => {
   };
   // Hết Phân trang
 
-  const listFile: any = await Media.find({})
+  const listFile: any = await Media.find(find)
     .sort({
       createdAt: "desc",
     })
@@ -38,7 +48,9 @@ export const fileManager = async (req: Request, res: Response) => {
   }
     // Danh sách folder
   let folderList = [];
-  const response = await axios.get(`${domainCDN}/file-manager/folder/list`);
+  // const response = await axios.get(`${domainCDN}/file-manager/folder/list`);
+  const response = await axios.get(`${domainCDN}/file-manager/folder/list?folderPath=${req.query.folderPath}`);
+  
   if(response.data.code == "success") {
     folderList = response.data.folderList;
     for (const item of folderList) {
