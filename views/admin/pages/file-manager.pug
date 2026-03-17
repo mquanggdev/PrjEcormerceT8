@@ -70,7 +70,13 @@ block main
                     )
 
                     i.las.la-pen.text-secondary.fs-18.ms-1
-                  a( href="#")
+                  
+                  a(
+                    href="javascript:;"
+                    button-delete-file
+                    data-file-id=item.id
+                    data-file-name=item.filename
+                    )
                     i.las.la-trash-alt.text-secondary.fs-18.ms-1
       +pagination()
     // end card-body

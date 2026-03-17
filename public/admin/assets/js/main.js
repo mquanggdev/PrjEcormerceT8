@@ -423,3 +423,32 @@ if(modalChangeFileName) {
   })
 }
 // End Modal Change File Name
+// Button Delete File
+const listButtonDeleteFile = document.querySelectorAll("[button-delete-file]");
+if(listButtonDeleteFile.length > 0) {
+  listButtonDeleteFile.forEach(button => {
+    button.addEventListener("click", () => {
+      const fileId = button.getAttribute("data-file-id");
+      const fileName = button.getAttribute("data-file-name");
+
+      const isConfirm = confirm(`Bạn có chắc muốn xóa file: ${fileName}`);
+      if(isConfirm) {
+        fetch(`/${pathAdmin}/file-manager/delete-file/${fileId}`, {
+          method: "DELETE"
+        })
+          .then(res => res.json())
+          .then(data => {
+            if(data.code == "error") {
+              notyf.error(data.message);
+            }
+
+            if(data.code == "success") {
+              drawNotify(data.code, data.message);
+              location.reload();
+            }
+          })
+      }
+    })
+  })
+}
+// End Button Delete File
