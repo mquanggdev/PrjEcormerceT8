@@ -80,6 +80,12 @@ export const uploadPost = async (req: Request, res: Response) => {
         contentType: file.mimetype,
       });
     });
+    
+    const folderPath = req.query.folderPath;
+    if(folderPath) {
+      formData.append("folderPath", folderPath);
+    }
+
 
     const response = await axios.post(
       "http://localhost:4000/file-manager/upload",
