@@ -458,3 +458,27 @@ export const editPatch = async (req: Request, res: Response) => {
     })
   }
 }
+
+
+export const deletePatch = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    await Blog.updateOne({
+      _id: id
+    }, {
+      deleted: true,
+      deletedAt: Date.now()
+    })
+
+    res.json({
+      code: "success",
+      message: "Xóa bài viết thành công!"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    })
+  }
+}
