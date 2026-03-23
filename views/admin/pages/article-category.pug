@@ -1,6 +1,7 @@
 
 extends ../layouts/default.pug
 include ../mixins/pagination.pug
+include ../mixins/form-search.pug
 
 block main
   .row
@@ -28,13 +29,7 @@ block main
           //- Table
           .row
             .col-lg-6
-              form.input-group.mb-3(form-search)
-                input.form-control(
-                  placeholder="Từ khóa..."
-                  type="text"
-                  name="keyword"
-                  )
-                button.btn.btn-secondary Tìm kiếm
+              +form-search()
           .table-responsive
             table.table.table-striped.mb-0
               thead.table-light

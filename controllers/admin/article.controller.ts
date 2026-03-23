@@ -23,7 +23,7 @@ export const category = async (req: Request, res: Response) => {
       find.search = keywordRegex;
     }
     // Phân trang
-    const limitItems = 2;
+    const limitItems = 20;
     let page = 1;
     if (req.query.page && parseInt(`${req.query.page}`) > 0) {
       page = parseInt(`${req.query.page}`);
@@ -321,4 +321,52 @@ export const createPost = async (req: Request, res: Response) => {
       message: "Dữ liệu không hợp lệ!"
     })
   }
+}
+
+export const list = async (req: Request, res: Response) => {
+  const find: {
+    deleted: boolean,
+    search?: RegExp
+  } = {
+    deleted: false
+  };
+
+  if(req.query.keyword) {
+    const keyword = slugify(`${req.query.keyword}`, {
+      replacement: " ",
+      lower: true
+    });
+    const keywordRegex = new RegExp(keyword, "i");
+    find.search = keywordRegex;
+  }
+
+  // Phân trang
+  const limitItems = 20;
+  let page = 1;
+  if(req.query.page && parseInt(`${req.query.page}`) > 0) {
+    page = parseInt(`${req.query.page}`);
+  }
+  const totalRecord = await Blog.countDocuments(find);
+  const totalPage = Math.ceil(totalRecord/limitItems);
+  const skip = (page - 1) * limitItems;
+  const pagination = {
+    totalRecord: totalRecord,
+    totalPage: totalPage,
+    skip: skip
+  };
+  // Hết Phân trang
+
+  const recordList: any = await Blog
+    .find(find)
+    .sort({
+      createdAt: "desc"
+    })
+    .limit(limitItems)
+    .skip(skip)
+
+  res.render("admin/pages/article-list", {
+    pageTitle: "Quản lý bài viết",
+    recordList: recordList,
+    pagination: pagination
+  });
 }
