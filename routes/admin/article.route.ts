@@ -51,4 +51,14 @@ router.post(
 
 router.get('/list', articleController.list);
 
+router.get('/edit/:id', articleController.edit);
+
+router.patch(
+  '/edit/:id', 
+  upload.none(), 
+  articleValidate.createPost, 
+  articleController.editPatch
+);
+
+
 export default router;
