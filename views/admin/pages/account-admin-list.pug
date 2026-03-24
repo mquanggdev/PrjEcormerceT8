@@ -1,0 +1,65 @@
+extends ../layouts/default.pug
+include ../mixins/pagination.pug
+include ../mixins/form-search.pug
+
+block main
+  .row
+    .col-12
+      .card
+        .card-header
+          .row.align-items-center
+            .col
+              h4.card-title #{pageTitle}
+            // end col
+            .col-auto
+              a.btn.btn-primary(
+                href=`/${pathAdmin}/account-admin/create`
+                )
+                i.fa-solid.fa-plus.me-1
+                | Tạo tài khoản
+                // end col
+            // end col
+          // end row
+        // end card-header
+        .card-body.pt-0
+          .row
+            .col-lg-6
+              +form-search()
+          .table-responsive
+            table.table.table-striped.mb-0
+              thead.table-light
+                tr
+                  th STT
+                  th Ảnh đại diện
+                  th Họ tên
+                  th Email
+                  th Nhóm quyền
+                  th Trạng thái
+                  th.text-end Hành động
+              tbody
+                tr
+                  td 1
+                  td
+                    img(
+                      src=`/admin/assets/images/products/06.png`
+                      class="rounded thumb-lg me-1 d-inline"
+                    )
+                  td Lê Văn A
+                  td levana@gmail.com
+                  td(style="max-width: 200px;")
+                    span(class="badge bg-dark me-1") Quản trị viên
+                    span(class="badge bg-dark me-1") Quản lý bài viết
+                  td
+                    span(class="badge bg-success") Hoạt động
+                  td.text-end
+                    a(href=`/${pathAdmin}/account-admin/edit/:id`)
+                      i.las.la-pen.text-secondary.font-16
+                    a(
+                      href="javascript:;"
+                      button-api
+                      data-method="PATCH"
+                      data-api=`/${pathAdmin}/account-admin/delete/:id`
+                    )
+                      i.las.la-trash-alt.text-secondary.font-16
+          //- +pagination()
+    // end col

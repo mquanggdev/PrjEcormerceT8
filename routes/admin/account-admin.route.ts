@@ -17,4 +17,6 @@ router.post(
   accountAdminController.createPost
 );
 
+router.get('/list', accountAdminController.list);
+
 export default router;

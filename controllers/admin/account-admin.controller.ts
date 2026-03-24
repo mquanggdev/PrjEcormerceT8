@@ -54,3 +54,9 @@ export const createPost = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const list = async (req: Request, res: Response) => {
+  res.render("admin/pages/account-admin-list", {
+    pageTitle: "Danh sách tài khoản quản trị"
+  });
+}
