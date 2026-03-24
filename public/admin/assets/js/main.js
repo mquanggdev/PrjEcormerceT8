@@ -712,3 +712,48 @@ if(articleEditForm) {
   ;
 }
 // End Article Edit Form
+
+// Role Create Form
+const roleCreateForm = document.querySelector("#roleCreateForm");
+if(roleCreateForm) {
+  const validation = new JustValidate('#roleCreateForm');
+
+  validation
+    .addField('#name', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên nhóm quyền!'
+      }
+    ])
+    .onSuccess((event) => {
+      const name = event.target.name.value;
+      const description = event.target.description.value;
+      const permissions = getCheckboxList("permissions");
+      const status = event.target.status.value;
+
+      // Tạo FormData
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("permissions", JSON.stringify(permissions));
+      formData.append("status", status);
+      
+      fetch(`/${pathAdmin}/role/create`, {
+        method: "POST",
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          if(data.code == "error") {
+            notyf.error(data.message);
+          }
+
+          if(data.code == "success") {
+            drawNotify("success", data.message);
+            location.reload();
+          }
+        })
+    })
+  ;
+}
+// End Role Create Form
