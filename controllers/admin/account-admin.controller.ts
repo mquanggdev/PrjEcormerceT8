@@ -56,7 +56,59 @@ export const createPost = async (req: Request, res: Response) => {
 }
 
 export const list = async (req: Request, res: Response) => {
+    const find: {
+    deleted: boolean,
+    search?: RegExp
+  } = {
+    deleted: false
+  };
+
+  if(req.query.keyword) {
+    const keyword = slugify(`${req.query.keyword}`, {
+      replacement: ' ',
+      lower: true, // Chữ thường
+    })
+    const keywordRegex = new RegExp(keyword, "i");
+    find.search = keywordRegex;
+  }
+
+  // Phân trang
+  const limitItems = 20;
+  let page = 1;
+  if(req.query.page) {
+    const currentPage = parseInt(`${req.query.page}`);
+    if(currentPage > 0) {
+      page = currentPage;
+    }
+  }
+  const totalRecord = await AccountAdmin.countDocuments(find);
+  const totalPage = Math.ceil(totalRecord/limitItems);
+  const skip = (page - 1) * limitItems;
+  const pagination = {
+    skip: skip,
+    totalRecord: totalRecord,
+    totalPage: totalPage
+  };
+  // Hết Phân trang
+
+  const recordList: any = await AccountAdmin
+    .find(find)
+    .limit(limitItems)
+    .skip(skip)
+    .sort({
+      createdAt: "desc"
+    });
+
+  for (const item of recordList) {
+    const roleList = await Role.find({
+      _id: { $in: item.roles }
+    })
+    item.rolesName = roleList.map(item => item.name);
+  }
+
   res.render("admin/pages/account-admin-list", {
-    pageTitle: "Danh sách tài khoản quản trị"
+    pageTitle: "Danh sách tài khoản quản trị",
+    recordList: recordList,
+    pagination: pagination
   });
 }
