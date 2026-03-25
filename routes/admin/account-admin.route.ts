@@ -30,5 +30,15 @@ router.patch(
 
 router.patch('/delete/:id', accountAdminController.deletePatch);
 
+router.get('/change-password/:id', accountAdminController.changePassword);
+
+router.patch(
+  '/change-password/:id', 
+  upload.none(), 
+  accountAdminValidate.changePasswordPatch,
+  accountAdminController.changePasswordPatch
+);
+
+
 
 export default router;
