@@ -3,6 +3,7 @@ import Role from '../../models/role.model';
 import slugify from 'slugify';
 import bcrypt from "bcryptjs";
 import AccountAdmin from '../../models/account-admin.model';
+import { pathAdmin } from '../../configs/variable.config';
 
 export const create = async (req: Request, res: Response) => {
   const roleList = await Role.find({
@@ -111,4 +112,88 @@ export const list = async (req: Request, res: Response) => {
     recordList: recordList,
     pagination: pagination
   });
+}
+
+
+export const edit = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const accountDetail = await AccountAdmin.findOne({
+      _id: id,
+      deleted: false
+    })
+
+    if(!accountDetail) {
+      res.redirect(`/${pathAdmin}/account-admin/list`);
+      return;
+    }
+
+    const roleList = await Role.find({
+      deleted: false,
+      status: "active"
+    })
+
+    res.render("admin/pages/account-admin-edit", {
+      pageTitle: "Chỉnh sửa tài khoản quản trị",
+      roleList: roleList,
+      accountDetail: accountDetail
+    });
+  } catch (error) {
+    res.redirect(`/${pathAdmin}/account-admin/list`);
+  }
+}
+
+export const editPatch = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const accountDetail = await AccountAdmin.findOne({
+      _id: id,
+      deleted: false
+    })
+
+    if(!accountDetail) {
+      res.json({
+        code: "error",
+        message: "Tài khoản không tồn tại!"
+      })
+      return;
+    }
+
+    const existEmail = await AccountAdmin.findOne({
+      email: req.body.email,
+      _id: { $ne: id } // not equal - không bằng
+    })
+
+    if(existEmail) {
+      res.json({
+        code: "error",
+        message: "Email đã được sử dụng bởi tác khoản khác!"
+      })
+      return;
+    }
+
+    req.body.roles = JSON.parse(req.body.roles);
+
+    req.body.search = slugify(`${req.body.fullName} ${req.body.email}`, {
+      replacement: " ",
+      lower: true
+    });
+
+    await AccountAdmin.updateOne({
+      _id: id,
+      deleted: false
+    }, req.body);
+
+    res.json({
+      code: "success",
+      message: "Cập nhật thành công!"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
 }
