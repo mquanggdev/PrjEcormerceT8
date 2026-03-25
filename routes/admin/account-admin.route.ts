@@ -28,5 +28,7 @@ router.patch(
   accountAdminController.editPatch
 );
 
+router.patch('/delete/:id', accountAdminController.deletePatch);
+
 
 export default router;

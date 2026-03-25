@@ -197,3 +197,27 @@ export const editPatch = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const deletePatch = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    await AccountAdmin.updateOne({
+      _id: id
+    }, {
+      deleted: true,
+      deletedAt: Date.now(),
+    });
+
+    res.json({
+      code: "success",
+      message: "Xóa tài khoản thành công!"
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    })
+  }
+}
