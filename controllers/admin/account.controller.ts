@@ -12,6 +12,32 @@ export const login = async (req: Request, res: Response) => {
 
 export const loginPost = async (req: Request, res: Response) => {
   const { email, password, rememberPassword } = req.body;
+    let token = "";
+
+  if(email === process.env.SUPER_ADMIN_EMAIL) {
+    const isMatch = password === process.env.SUPER_ADMIN_PASSWORD;
+
+    if(!isMatch) {
+      res.json({
+        code: "error",
+        message: "Mật khẩu không chính xác!"
+      })
+      return;
+    }
+
+    // Tạo JWT token
+    token = jwt.sign(
+      {
+        id: process.env.SUPER_ADMIN_ID,
+        email: process.env.SUPER_ADMIN_EMAIL
+      },
+      `${process.env.JWT_SECRET}`,
+      {
+        expiresIn: rememberPassword == "true" ? "7d" : "1d"
+      }
+    );
+  } else {
+
 
   const existAccount = await AccountAdmin.findOne({
     email: email,
@@ -45,7 +71,7 @@ export const loginPost = async (req: Request, res: Response) => {
   }
 
   // Tạo JWT token
-  const token = jwt.sign(
+   token = jwt.sign(
     {
       id: existAccount.id,
       email: existAccount.email
@@ -55,6 +81,7 @@ export const loginPost = async (req: Request, res: Response) => {
       expiresIn: rememberPassword == "true" ? "7d" : "1d"
     }
   );
+}
 
   // Lưu token vào cookie
   res.cookie("tokenAdmin", token, {
