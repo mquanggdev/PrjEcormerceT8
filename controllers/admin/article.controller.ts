@@ -274,7 +274,9 @@ export const destroyCategoryDelete = async (req: Request, res: Response) => {
 
 
 export const create = async (req: Request, res: Response) => {
-  const categoryList = await CategoryBlog.find({});
+  const categoryList = await CategoryBlog.find({
+        deleted: false
+  });
 
   const categoryTree = buildCategoryTree(categoryList);
 

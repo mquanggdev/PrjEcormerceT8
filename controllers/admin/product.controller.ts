@@ -176,3 +176,25 @@ export const editCategoryPatch = async (req: Request, res: Response) => {
     })
   }
 }
+export const deleteCategoryPatch = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    await CategoryProduct.updateOne({
+      _id: id
+    }, {
+      deleted: true,
+      deletedAt: Date.now()
+    })
+
+    res.json({
+      code: "success",
+      message: "Xóa danh mục thành công!"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    })
+  }
+}
