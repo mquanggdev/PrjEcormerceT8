@@ -1,0 +1,22 @@
+
+import { Router } from "express";
+import * as productController from "../../controllers/admin/product.controller";
+import multer from "multer";
+import * as productValidate from "../../validates/admin/product.validate";
+
+const router = Router();
+
+const upload = multer();
+
+router.get('/category', productController.category);
+
+router.get('/category/create', productController.createCategory);
+
+router.post(
+  '/category/create', 
+  upload.none(), 
+  productValidate.createCategoryPost, 
+  productController.createCategoryPost
+);
+
+export default router;
