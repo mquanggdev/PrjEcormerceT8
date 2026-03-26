@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { pathAdmin } from "../../configs/variable.config";
+import { pathAdmin,permissionList  } from "../../configs/variable.config";
 import jwt from "jsonwebtoken";
 import AccountAdmin from "../../models/account-admin.model";
+import Role from "../../models/role.model";
 
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -22,6 +23,9 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
         avatar: "/admin/assets/images/users/avatar-1.jpg",
         isSuperAdmin: true
       };
+
+      res.locals.permissions = permissionList.map(item => item.id);
+
     } else {
     const existAccount = await AccountAdmin.findOne({
       _id: decoded.id,
@@ -41,11 +45,42 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
       avatar: existAccount.avatar,
       isSuperAdmin: false
     };
+
+    let permissions: string[] = [];
+
+      for (const roleId of existAccount.roles) { // lọc tài khoản xem có những quyền nào : quyền quản lý blog -> trong cái quyền quản lý blog thì được phép truy cập những trang nào ! Nếu có trên 2 quyền thì cộng dồn các chức năng mà quyền đó mang lại
+        const roleInfo = await Role.findOne({
+          _id: roleId,
+          deleted: false,
+          status: "active"
+        })
+
+        if(roleInfo) {
+          permissions = [...permissions, ...roleInfo.permissions];
+        }
+      }
+
+      res.locals.permissions = permissions;
     }
 
     next();
   } catch (error) {
     console.log(error);
     res.redirect(`/${pathAdmin}/account/login`);
+  }
+}
+
+
+
+export const checkPermission = (permission: string) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if(res.locals.permissions.includes(permission)) {
+      next();
+    } else {
+      res.json({
+        code: "error",
+        message: "Không đủ quyền!"
+      });
+    }
   }
 }

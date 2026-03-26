@@ -6,6 +6,7 @@ export const permissionList = [
     id: "dashboard",
     name: "Trang tổng quan"
   },
+  //bài viết
   {
     id: "article-list",
     name: "Danh sách bài viết"
@@ -26,6 +27,7 @@ export const permissionList = [
     id: "article-trash",
     name: "Thùng rác bài viết"
   },
+  // danh mục
   {
     id: "article-category",
     name: "Danh mục bài viết"
@@ -46,6 +48,7 @@ export const permissionList = [
     id: "article-category-trash",
     name: "Thùng rác danh mục bài viết"
   },
+  // phân quyền
   {
     id: "role-list",
     name: "Danh sách nhóm quyền"
@@ -66,6 +69,28 @@ export const permissionList = [
     id: "role-trash",
     name: "Thùng rác nhóm quyền"
   },
+  // quản trị
+  {
+    id: "account-admin-list",
+    name: "Danh sách tài khoản quản trị"
+  },
+  {
+    id: "account-admin-create",
+    name: "Tạo tài khoản quản trị"
+  },
+  {
+    id: "account-admin-edit",
+    name: "Sửa tài khoản quản trị"
+  },
+  {
+    id: "account-admin-change-password",
+    name: "Đổi mật khẩu tài khoản quản trị"
+  },
+  {
+    id: "account-admin-delete",
+    name: "Xóa tài khoản quản trị"
+  },
+  // quản lý
   {
     id: "file-manager",
     name: "Quản lý file"
