@@ -3,6 +3,9 @@ import AccountAdmin from '../../models/account-admin.model';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pathAdmin } from '../../configs/variable.config';
+import { logAdminAction } from '../../helpers/log.helper';
+import { RequestAccount } from '../../interfaces/request.interface';
+
 
 export const login = async (req: Request, res: Response) => {
   res.render("admin/pages/account-login", {
@@ -10,7 +13,7 @@ export const login = async (req: Request, res: Response) => {
   });
 }
 
-export const loginPost = async (req: Request, res: Response) => {
+export const loginPost = async (req: RequestAccount, res: Response) => {
   const { email, password, rememberPassword } = req.body;
     let token = "";
 
@@ -36,6 +39,8 @@ export const loginPost = async (req: Request, res: Response) => {
         expiresIn: rememberPassword == "true" ? "7d" : "1d"
       }
     );
+    
+    req.adminId = process.env.SUPER_ADMIN_ID;
   } else {
 
 
@@ -81,6 +86,7 @@ export const loginPost = async (req: Request, res: Response) => {
       expiresIn: rememberPassword == "true" ? "7d" : "1d"
     }
   );
+  req.adminId = existAccount.id;
 }
 
   // Lưu token vào cookie
@@ -91,6 +97,8 @@ export const loginPost = async (req: Request, res: Response) => {
     maxAge: rememberPassword == "true" ? (7 * 24 * 60 * 60 * 1000) : (24 * 60 * 60 * 1000) // 7 ngày hoặc 1 ngày
   });
 
+  logAdminAction(req, "Đã đăng nhập");
+
   res.json({
     code: "success",
     message: "Đăng nhập thành công!"
@@ -99,5 +107,6 @@ export const loginPost = async (req: Request, res: Response) => {
 
 export const logout = async (req: Request, res: Response) => {
   res.clearCookie("tokenAdmin");
+  logAdminAction(req, "Đã đăng xuất");
   res.redirect(`/${pathAdmin}/account/login`);
 }

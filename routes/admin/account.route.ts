@@ -3,6 +3,7 @@ import { Router } from "express";
 import * as accountController from "../../controllers/admin/account.controller";
 import multer from "multer";
 import * as accountValidate from "../../validates/admin/account.validate";
+import * as authMiddleware from "../../middlewares/admin/auth.middleware";
 
 const router = Router();
 
@@ -17,6 +18,6 @@ router.post(
   accountController.loginPost
 );
 
-router.get('/logout', accountController.logout);
+router.get('/logout',authMiddleware.verifyToken,  accountController.logout);
 
 export default router;

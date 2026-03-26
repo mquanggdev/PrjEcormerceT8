@@ -4,6 +4,7 @@ import { buildCategoryTree } from "../../helpers/category.helper";
 import slugify from "slugify";
 import Blog from '../../models/blog.model';
 import { pathAdmin } from "../../configs/variable.config";
+import { logAdminAction } from '../../helpers/log.helper';
 
 export const category = async (req: Request, res: Response) => {
   try {
@@ -310,6 +311,7 @@ export const createPost = async (req: Request, res: Response) => {
 
     const newRecord = new Blog(req.body);
     await newRecord.save();
+    logAdminAction(req, `Đã tạo bài viết: ${req.body.name} (Id: ${newRecord.id})`);
 
     res.json({
       code: "success",
@@ -447,6 +449,8 @@ export const editPatch = async (req: Request, res: Response) => {
       deleted: false
     }, req.body);
 
+    logAdminAction(req, `Đã sửa bài viết: ${req.body.name} (Id: ${id})`);
+
     res.json({
       code: "success",
       message: "Cập nhật bài viết thành công!"
@@ -470,6 +474,8 @@ export const deletePatch = async (req: Request, res: Response) => {
       deleted: true,
       deletedAt: Date.now()
     })
+    
+        logAdminAction(req, `Đã xóa bài viết: ${id}`);
 
     res.json({
       code: "success",

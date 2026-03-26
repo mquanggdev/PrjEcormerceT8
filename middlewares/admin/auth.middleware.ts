@@ -3,8 +3,9 @@ import { pathAdmin,permissionList  } from "../../configs/variable.config";
 import jwt from "jsonwebtoken";
 import AccountAdmin from "../../models/account-admin.model";
 import Role from "../../models/role.model";
+import { RequestAccount } from "../../interfaces/request.interface";
 
-export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = async (req: RequestAccount, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies.tokenAdmin;
 
@@ -25,6 +26,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
       };
 
       res.locals.permissions = permissionList.map(item => item.id);
+      req.adminId = process.env.SUPER_ADMIN_ID;
 
     } else {
     const existAccount = await AccountAdmin.findOne({
@@ -61,6 +63,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
       }
 
       res.locals.permissions = permissions;
+      req.adminId = existAccount.id;
     }
 
     next();
