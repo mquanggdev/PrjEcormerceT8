@@ -6,13 +6,16 @@ import slugify from 'slugify';
 import CategoryBlog from '../../models/categories-blog.model';
 import Blog from '../../models/blog.model';
 import CategoryProduct from '../../models/category-product.model';
+import Product from '../../models/product.model';
 
 import { generateRandomString } from '../../helpers/generate.helper';
 import mongoose from 'mongoose';
 const models: any = {
   CategoryBlog: CategoryBlog,
   Blog: Blog,
-  CategoryProduct: CategoryProduct
+  CategoryProduct: CategoryProduct,
+  Product: Product
+
 };
 
 

@@ -3,6 +3,9 @@ import CategoryProduct from '../../models/category-product.model';
 import slugify from 'slugify';
 import { buildCategoryTree } from '../../helpers/category.helper';
 import { pathAdmin } from '../../configs/variable.config';
+import Product from '../../models/product.model';
+import { logAdminAction } from '../../helpers/log.helper';
+
 
 export const category = async (req: Request, res: Response) => {
   const find: {
@@ -198,3 +201,68 @@ export const deleteCategoryPatch = async (req: Request, res: Response) => {
     })
   }
 }
+export const create = async (req: Request, res: Response) => {
+  const categoryList = await CategoryProduct.find({});
+
+  const categoryTree = buildCategoryTree(categoryList);
+
+  res.render("admin/pages/product-create", {
+    pageTitle: "Tạo sản phẩm",
+    categoryList: categoryTree
+  });
+}
+
+export const createPost = async (req: Request, res: Response) => {
+  try {
+    const existSlug = await Product.findOne({
+      slug: req.body.slug
+    })
+
+    if(existSlug) {
+      res.json({
+        code: "error",
+        message: "Đường dẫn đã tồn tại!"
+      })
+      return;
+    }
+
+    if(req.body.position) {
+      req.body.position = parseInt(req.body.position);
+    } else {
+      // Nếu không truyền position -> lấy position lớn nhất + 1
+      const recordMaxPosition = await Product
+        .findOne({})
+        .sort({
+          position: "desc"
+        });
+      if(recordMaxPosition && recordMaxPosition.position) {
+        req.body.position = recordMaxPosition.position + 1;
+      } else {
+        req.body.position = 1;
+      }
+    }
+
+    req.body.category = JSON.parse(req.body.category);
+
+    req.body.search = slugify(`${req.body.name}`, {
+      replacement: " ",
+      lower: true
+    });
+
+    const newRecord = new Product(req.body);
+    await newRecord.save();
+
+    logAdminAction(req, `Đã tạo sản phẩm: ${req.body.name} (Id: ${newRecord.id})`);
+
+    res.json({
+      code: "success",
+      message: "Tạo sản phẩm thành công!"
+    })
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+ 
