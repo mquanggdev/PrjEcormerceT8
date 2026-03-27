@@ -203,13 +203,21 @@ export const deleteCategoryPatch = async (req: Request, res: Response) => {
   }
 }
 export const create = async (req: Request, res: Response) => {
-  const categoryList = await CategoryProduct.find({});
+  const categoryList = await CategoryProduct.find({
+     deleted: false
+  });
 
   const categoryTree = buildCategoryTree(categoryList);
+  
+  const attributeList = await AttributeProduct.find({
+    deleted: false
+  });
+
 
   res.render("admin/pages/product-create", {
     pageTitle: "Tạo sản phẩm",
-    categoryList: categoryTree
+    categoryList: categoryTree,
+    attributeList: attributeList
   });
 }
 
