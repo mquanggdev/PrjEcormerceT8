@@ -23,8 +23,12 @@ block main
         // end card-header
         .card-body.pt-0
           .row
-            .col-lg-6
+            .col-sm-6
               +form-search()
+            .col-sm-3
+              a.btn.w-100.btn-info(href=`/${pathAdmin}/product/export/csv`)
+                i.fa-solid.fa-download.me-1
+                | Xuất Excel
           .table-responsive
             table.table.table-striped.mb-0
               thead.table-light

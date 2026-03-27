@@ -76,4 +76,6 @@ router.patch(
 router.patch('/attribute/delete/:id', productController.deleteAttributePatch);
 
 
+router.get('/export/csv', productController.exportCSV);
+
 export default router;

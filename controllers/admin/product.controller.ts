@@ -6,6 +6,7 @@ import { pathAdmin } from '../../configs/variable.config';
 import Product from '../../models/product.model';
 import { logAdminAction } from '../../helpers/log.helper';
 import AttributeProduct from '../../models/attribute-product.model';
+import { Parser } from 'json2csv';
 
 
 export const category = async (req: Request, res: Response) => {
@@ -675,5 +676,24 @@ export const deleteAttributePatch = async (req: Request, res: Response) => {
       code: "error",
       message: "Id không hợp lệ!"
     })
+  }
+}
+
+
+export const exportCSV = async (req: Request, res: Response) => {
+  try {
+    const productList = await Product.find().lean();
+
+    // Chuyển JSON sang CSV
+    const parser = new Parser();
+    let csv = parser.parse(productList);
+    csv = '\ufeff' + csv;
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment('products.csv');
+
+    res.send(csv);
+  } catch (error) {
+    console.log(error);
   }
 }
