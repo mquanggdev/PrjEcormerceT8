@@ -274,6 +274,8 @@ export const createPost = async (req: Request, res: Response) => {
     if(req.body.stock) {
       req.body.stock = parseInt(req.body.stock);
     }
+    
+    req.body.tags = JSON.parse(req.body.tags);
 
     
     req.body.attributes = JSON.parse(req.body.attributes);
