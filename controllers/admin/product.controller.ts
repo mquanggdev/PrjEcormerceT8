@@ -298,6 +298,57 @@ export const createPost = async (req: Request, res: Response) => {
     })
   }
 }
+export const list = async (req: Request, res: Response) => {
+  const find: {
+    deleted: boolean,
+    search?: RegExp
+  } = {
+    deleted: false
+  };
+
+  if(req.query.keyword) {
+    const keyword = slugify(`${req.query.keyword}`, {
+      replacement: ' ',
+      lower: true, // Chữ thường
+    })
+    const keywordRegex = new RegExp(keyword, "i");
+    find.search = keywordRegex;
+  }
+
+  // Phân trang
+  const limitItems = 20;
+  let page = 1;
+  if(req.query.page) {
+    const currentPage = parseInt(`${req.query.page}`);
+    if(currentPage > 0) {
+      page = currentPage;
+    }
+  }
+  const totalRecord = await Product.countDocuments(find);
+  const totalPage = Math.ceil(totalRecord/limitItems);
+  const skip = (page - 1) * limitItems;
+  const pagination = {
+    skip: skip,
+    totalRecord: totalRecord,
+    totalPage: totalPage
+  };
+  // Hết Phân trang
+
+  const recordList: any = await Product
+    .find(find)
+    .limit(limitItems)
+    .skip(skip)
+    .sort({
+      position: "desc"
+    });
+
+  res.render("admin/pages/product-list", {
+    pageTitle: "Quản lý sản phẩm",
+    recordList: recordList,
+    pagination: pagination
+  });
+}
+
 
  export const attribute = async (req: Request, res: Response) => {
   const find: {

@@ -38,7 +38,7 @@ router.post(
   productValidate.createPost, 
   productController.createPost
 );
-
+router.get('/list', productController.list);
 
 router.get('/attribute', productController.attribute);
 
@@ -61,5 +61,6 @@ router.patch(
 );
 
 router.patch('/attribute/delete/:id', productController.deleteAttributePatch);
+
 
 export default router;
