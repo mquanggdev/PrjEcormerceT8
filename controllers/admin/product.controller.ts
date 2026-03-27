@@ -252,6 +252,16 @@ export const createPost = async (req: Request, res: Response) => {
       replacement: " ",
       lower: true
     });
+    
+    if(req.body.priceOld) {
+      req.body.priceOld = parseInt(req.body.priceOld);
+    }
+
+    if(req.body.priceNew) {
+      req.body.priceNew = parseInt(req.body.priceNew);
+    } else {
+      req.body.priceNew = req.body.priceOld;
+    }
 
     const newRecord = new Product(req.body);
     await newRecord.save();
