@@ -628,6 +628,27 @@ const getMultiFile = (name) => {
 }
 // End Get Multi File
 
+// Option List
+const getOptionList = (name) => {
+  const optionList = document.querySelectorAll(`[box-option="${name}"] .option-list .option-item`);
+  const dataFinal = [];
+
+  optionList.forEach(item => {
+    const label = item.querySelector(".option-label").value;
+    const value = item.querySelector(".option-value").value;
+    if(label && value) {
+      dataFinal.push({
+        label: label,
+        value: value
+      });
+    }
+  })
+  
+  return dataFinal;
+}
+// End Option List
+
+
 // Article Create Form
 const articleCreateForm = document.querySelector("#articleCreateForm");
 if(articleCreateForm) {
@@ -1362,3 +1383,84 @@ if(listElementListImage.length > 0) {
 }
 // End Button Remove Image
 
+// box-option
+const boxOption = document.querySelector("[box-option]");
+if(boxOption) {
+  const optionList = boxOption.querySelector(".option-list");
+  const optionCreate = boxOption.querySelector(".option-create");
+
+  // Tạo option
+  optionCreate.addEventListener("click", () => {
+    const newItem = `
+      <div class="option-item">
+        <span class="btn btn-secondary option-move">
+          <i class="fa-solid fa-up-down-left-right"></i>
+        </span>
+        <input class="form-control option-label" type="text" placeholder="Nhãn">
+        <input class="form-control option-value" type="text" placeholder="Giá trị">
+        <span class="btn btn-danger option-remove">Xóa</span>
+      </div>
+    `;
+    optionList.insertAdjacentHTML("beforeend", newItem);
+  })
+
+  // Xóa option
+  optionList.addEventListener("click", (event) => {
+    if(event.target.closest(".option-remove")) {
+      const parentItem = event.target.closest(".option-item");
+      if(parentItem) {
+        parentItem.remove();
+      }
+    }
+  })
+
+  // Sắp xếp
+  new Sortable(optionList, {
+    animation: 150,
+    handle: '.option-move',
+  });
+}
+// End box-option
+
+// Product Create Attribute Form
+const productCreateAttributeForm = document.querySelector("#productCreateAttributeForm");
+if(productCreateAttributeForm) {
+  const validation = new JustValidate('#productCreateAttributeForm');
+
+  validation
+    .addField('#name', [
+      {
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên thuộc tính!'
+      }
+    ])
+    .onSuccess((event) => {
+      const name = event.target.name.value;
+      const type = event.target.type.value;
+      const options = getOptionList("options");
+
+      // Tạo FormData
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("type", type);
+      formData.append("options", JSON.stringify(options));
+      
+      fetch(`/${pathAdmin}/product/attribute/create`, {
+        method: "POST",
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          if(data.code == "error") {
+            notyf.error(data.message);
+          }
+
+          if(data.code == "success") {
+            drawNotify("success", data.message);
+            location.reload();
+          }
+        })
+    })
+  ;
+}
+// End Product Create Attribute Form

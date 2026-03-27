@@ -5,6 +5,7 @@ import { buildCategoryTree } from '../../helpers/category.helper';
 import { pathAdmin } from '../../configs/variable.config';
 import Product from '../../models/product.model';
 import { logAdminAction } from '../../helpers/log.helper';
+import AttributeProduct from '../../models/attribute-product.model';
 
 
 export const category = async (req: Request, res: Response) => {
@@ -268,4 +269,40 @@ export const createPost = async (req: Request, res: Response) => {
     })
   }
 }
- 
+
+ export const attribute = async (req: Request, res: Response) => {
+  res.render("admin/pages/product-attribute", {
+    pageTitle: "Quản lý thuộc tính sản phẩm"
+  });
+}
+
+export const createAttribute = async (req: Request, res: Response) => {
+  res.render("admin/pages/product-create-attribute", {
+    pageTitle: "Tạo thuộc tính sản phẩm"
+  });
+}
+
+export const createAttributePost = async (req: Request, res: Response) => {
+  try {
+    req.body.options = JSON.parse(req.body.options);
+
+    req.body.search = slugify(`${req.body.name}`, {
+      replacement: " ",
+      lower: true
+    });
+
+    const newRecord = new AttributeProduct(req.body);
+    await newRecord.save();
+
+    res.json({
+      code: "success",
+      message: "Tạo thuộc tính thành công!"
+    })
+  } catch (error) {
+    console.error(error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
