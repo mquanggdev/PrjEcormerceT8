@@ -35,8 +35,8 @@ block main
                   th Danh sách lựa chọn
                   th.text-end Hành động
               tbody
-                tr
-                  each item, index in recordList
+                each item, index in recordList
+                  tr  
                     td #{pagination.skip + index + 1}
                     td #{item.name}
                     td #{item.type}
