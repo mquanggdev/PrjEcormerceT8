@@ -40,6 +40,16 @@ router.post(
 );
 router.get('/list', productController.list);
 
+router.get('/edit/:id', productController.edit);
+
+router.patch(
+  '/edit/:id', 
+  upload.none(), 
+  productValidate.createPost, 
+  productController.editPatch
+);
+
+
 router.get('/attribute', productController.attribute);
 
 router.get('/attribute/create', productController.createAttribute);
