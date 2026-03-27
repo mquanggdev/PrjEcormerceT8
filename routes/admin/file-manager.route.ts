@@ -6,7 +6,19 @@ import { checkPermission } from "../../middlewares/admin/auth.middleware";
 
 const router = Router();
 
-const upload = multer();
+// const upload = multer();
+// Dùng memoryStorage để giữ file trong buffer
+const storage = multer.memoryStorage();
+// Fix lỗi font tiếng Việt trong tên file (multer mặc định Latin1)
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    // Ép originalname về UTF-8
+    file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
+    cb(null, true);
+  }
+});
+
 
 router.get('/',checkPermission("file-manager"), fileManagerController.fileManager);
 
