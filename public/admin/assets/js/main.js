@@ -1273,6 +1273,7 @@ if(productCreateForm) {
       const images = getMultiFile("images");
       const priceOld = event.target.priceOld.value;
       const priceNew = event.target.priceNew.value;
+      const stock = event.target.stock.value;
       const attributes = getCheckboxList("attributes");      
       // variants
       const variants = [];
@@ -1290,11 +1291,19 @@ if(productCreateForm) {
         } else {
           priceNew = priceOld;
         }
+        
+        let stock = tr.querySelector("[stock]").value;
+        if(stock) {
+          stock = parseInt(stock);
+        } else {
+          stock = 0;
+        }
         variants.push({
           status: status,
           attributeValue: attributeValue,
           priceOld: priceOld,
-          priceNew: priceNew
+          priceNew: priceNew,
+          stock: stock,
         });
       })
       // End variants
@@ -1312,6 +1321,7 @@ if(productCreateForm) {
       formData.append("images", JSON.stringify(images));
       formData.append("priceOld", priceOld);
       formData.append("priceNew", priceNew);
+      formData.append("stock", stock);
       formData.append("attributes", JSON.stringify(attributes));
       formData.append("variants", JSON.stringify(variants));
 
@@ -1585,6 +1595,7 @@ if(buttonRenderVariant) {
     variantHeadHTML += `
       <th scope="col">Giá cũ</th>
       <th scope="col">Giá mới</th>
+      <th scope="col">Còn lại</th>
     `;
     variantHead.innerHTML = variantHeadHTML;
 
@@ -1615,6 +1626,9 @@ if(buttonRenderVariant) {
         </td>
         <td>
           <input class="form-control" type="number" value="${priceNew}" price-new>
+        </td>
+        <td>
+          <input class="form-control" type="number" stock>
         </td>
       `;
       tr += "</tr>";

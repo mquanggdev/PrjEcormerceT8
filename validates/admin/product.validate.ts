@@ -56,6 +56,7 @@ export const createPost = (req: Request, res: Response, next: NextFunction) => {
     images: Joi.string().allow(''),
     priceOld: Joi.string().allow(''),
     priceNew: Joi.string().allow(''),
+    stock: Joi.string().allow(''),
     attributes: Joi.string().allow(''),
     variants: Joi.string().allow(''),
   });

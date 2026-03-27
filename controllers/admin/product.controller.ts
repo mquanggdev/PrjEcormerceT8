@@ -270,6 +270,10 @@ export const createPost = async (req: Request, res: Response) => {
     } else {
       req.body.priceNew = req.body.priceOld;
     }
+    
+    if(req.body.stock) {
+      req.body.stock = parseInt(req.body.stock);
+    }
 
     
     req.body.attributes = JSON.parse(req.body.attributes);
