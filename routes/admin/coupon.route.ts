@@ -17,5 +17,19 @@ router.post(
 );
 router.get('/list', couponController.list);
 
+router.get('/edit/:id', couponController.edit);
+
+router.patch(
+  '/edit/:id', 
+  upload.none(), 
+  couponValidate.createPost,
+  couponController.editPatch
+);
+
+router.patch(
+  '/delete/:id', 
+  couponController.deletePatch
+);
+
 
 export default router;
