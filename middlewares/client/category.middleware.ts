@@ -2,7 +2,7 @@
 import { NextFunction, Request, Response } from "express";
 import CategoryProduct from "../../models/category-product.model";
 import { buildCategoryTree } from "../../helpers/category.helper";
-import CategoryBlog from "../../models/category-blog.model";
+import CategoryBlog from "../../models/categories-blog.model";
 
 export const getAllCategory = async (req: Request, res: Response, next: NextFunction) => {
   // Danh sách danh mục sản phẩm
