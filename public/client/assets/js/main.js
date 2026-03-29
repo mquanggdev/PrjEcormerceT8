@@ -1,4 +1,3 @@
-
 // pagination
 const pagination = document.querySelector(".pagination");
 if(pagination) {
@@ -18,3 +17,13 @@ if(pagination) {
   })
 }
 // End pagination
+
+// button-share
+const listButtonShare = document.querySelectorAll("[button-share]");
+if(listButtonShare.length > 0) {
+  listButtonShare.forEach(button => {
+    button.href = button.href + window.location.href;
+    // button.href = button.href + "https://28tech.com.vn/lap-trinh-backend-nodejs-middle";
+  })
+}
+// End button-share
