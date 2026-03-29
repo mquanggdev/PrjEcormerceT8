@@ -21,7 +21,7 @@ nav.d-none.d-lg-block(class="main_menu_2 main_menu")
                     alt="category icon" 
                     src="/client/assets/images/bar_icon_white.svg"
                     )
-                | Danh Mục Sản Phẩm 
+                | Danh Mục Sản Phẩm
               i.fas.fa-chevron-down
             +renderCategory(categoryProductList, 0)
           ul(class="menu_item")
@@ -46,7 +46,6 @@ nav.d-none.d-lg-block(class="main_menu_2 main_menu")
                   if (item.status)
                     li
                       a(href=`/article/category/${item.slug}`) #{item.name}
-
           ul(class="menu_icon")
             li
               a(href="compare.html")
