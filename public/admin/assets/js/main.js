@@ -1964,3 +1964,18 @@ if(couponEditForm) {
   ;
 }
 // End Coupon Edit Form
+
+// format-money
+const listFormatMoney = document.querySelectorAll("[format-money]");
+if(listFormatMoney.length > 0) {
+  listFormatMoney.forEach(input => {
+    input.addEventListener("input", () => {
+      let value = input.value;
+      value = value.replace(/\./g, '');
+      value = parseInt(value);
+      const valueFomat = value.toLocaleString("vi-VN");
+      input.value = valueFomat;
+    })
+  })
+}
+// End format-money
