@@ -93,11 +93,30 @@ export const articleByCategory = async (req: Request, res: Response) => {
 
 
 export const detail = async (req: Request, res: Response) => {
-  const articleDetail = await Blog.findOne({
+  const articleDetail : any = await Blog.findOne({
     slug: req.params.slug,
     deleted: false,
     status: "published"
   })
+  
+    if(articleDetail.updatedBy) {
+    const accountInfo = await AccountAdmin.findOne({
+      _id: articleDetail.updatedBy
+    })
+    if(accountInfo) {
+      articleDetail.authorName = accountInfo.fullName;
+      articleDetail.date = moment(articleDetail.updatedAt).format("DD/MM/YYYY");
+    }
+  } else {
+    const accountInfo = await AccountAdmin.findOne({
+      _id: articleDetail.createdBy
+    })
+    if(accountInfo) {
+      articleDetail.authorName = accountInfo.fullName;
+      articleDetail.date = moment(articleDetail.createdAt).format("DD/MM/YYYY");
+    }
+  }
+
 
   if(!articleDetail) {
     res.redirect("/");
