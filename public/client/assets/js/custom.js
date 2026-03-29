@@ -57,6 +57,33 @@ $(function () {
     //======NICE SELECT=======
     $('.select_js').niceSelect();
 
+        // selectJS
+    const selectJS = document.querySelector("[select-js]");
+    if(selectJS) {
+        const url = new URL(window.location.href);
+
+        selectJS.addEventListener("click", (event) => {
+            if (event.target.classList.contains("option")) {
+                const value = event.target.getAttribute("data-value");
+                if (value) {
+                    url.searchParams.set("limitItems", value);
+                } else {
+                    url.searchParams.delete("limitItems");
+                }
+                window.location.href = url.href;
+            }
+        });
+
+        // Hiển thị lựa chọn mặc định
+        const currentValue = url.searchParams.get("limitItems");
+        if (currentValue) {
+            selectJS.querySelector(".show").value = currentValue;
+            $('.show.select_js').niceSelect('update');
+        }
+    }
+    // End selectJS
+
+
 
     //=====WOW JS====== 
     new WOW().init();
