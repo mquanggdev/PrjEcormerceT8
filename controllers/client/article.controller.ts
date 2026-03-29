@@ -1,69 +1,91 @@
+import { Request, Response } from "express";
 
-import { Request, Response } from 'express';
-
-import CategoryBlog from '../../models/categories-blog.model';
-import Blog from '../../models/blog.model';
-import moment from 'moment';
-import AccountAdmin from '../../models/account-admin.model';
+import CategoryBlog from "../../models/categories-blog.model";
+import Blog from "../../models/blog.model";
+import moment from "moment";
+import AccountAdmin from "../../models/account-admin.model";
 
 export const articleByCategory = async (req: Request, res: Response) => {
+  try {
     const categoryDetail = await CategoryBlog.findOne({
-    slug: req.params.slug,
-    deleted: false,
-    status: "active"
-  })
+      slug: req.params.slug,
+      deleted: false,
+      status: "active",
+    });
 
-  if(!categoryDetail) {
-    res.redirect("/");
-    return;
-  }
-
-
-  const articleList: any = await Blog
-    .find({
+    if (!categoryDetail) {
+      res.redirect("/");
+      return;
+    }
+    const find: {
+      category: string;
+      status: string;
+      deleted: boolean;
+    } = {
       category: categoryDetail.id,
       status: "published",
-      deleted: false
-    })
-    .sort({
-      createdAt: "desc"
-    })
+      deleted: false,
+    };
 
-      console.log(articleList);
-
-  for (const item of articleList) {
-    // if(item.createdAt) {
-    //   item.createdAtFormat = moment(item.createdAt).format("DD/MM/YYYY");
-    // }
-
-    if(item.updatedBy) {
-      const accountInfo = await AccountAdmin.findOne({
-        _id: item.updatedBy
-      })
-      if(accountInfo) {
-        item.authorName = accountInfo.fullName;
-        item.date = moment(item.updatedAt).format("DD/MM/YYYY");
-      }
-    } else {
-      const accountInfo = await AccountAdmin.findOne({
-        _id: item.createdBy
-      })
-      if(accountInfo) {
-        item.authorName = accountInfo.fullName;
-        item.date = moment(item.createdAt).format("DD/MM/YYYY");
+    // Phân trang
+    const limitItems = 2;
+    let page = 1;
+    if (req.query.page) {
+      const currentPage = parseInt(`${req.query.page}`);
+      if (currentPage > 0) {
+        page = currentPage;
       }
     }
+    const totalRecord = await Blog.countDocuments(find);
+    const totalPage = Math.ceil(totalRecord / limitItems);
+    const skip = (page - 1) * limitItems;
+    const pagination = {
+      totalPage: totalPage,
+      currentPage: page,
+    };
+    // Hết Phân trang
+    
+    const articleList: any = await Blog
+      .find(find)
+      .limit(limitItems)
+      .skip(skip)
+      .sort({
+        createdAt: "desc"
+      });
+
+
+
+    for (const item of articleList) {
+      // if(item.createdAt) {
+      //   item.createdAtFormat = moment(item.createdAt).format("DD/MM/YYYY");
+      // }
+
+      if (item.updatedBy) {
+        const accountInfo = await AccountAdmin.findOne({
+          _id: item.updatedBy,
+        });
+        if (accountInfo) {
+          item.authorName = accountInfo.fullName;
+          item.date = moment(item.updatedAt).format("DD/MM/YYYY");
+        }
+      } else {
+        const accountInfo = await AccountAdmin.findOne({
+          _id: item.createdBy,
+        });
+        if (accountInfo) {
+          item.authorName = accountInfo.fullName;
+          item.date = moment(item.createdAt).format("DD/MM/YYYY");
+        }
+      }
+    }
+
+    res.render("client/pages/article-by-category", {
+      pageTitle: categoryDetail.name,
+      categoryDetail: categoryDetail,
+      articleList: articleList,
+      pagination: pagination
+    });
+  } catch (error) {
+    console.log(error);
   }
-
-
-
-  
-
-
-
-  res.render("client/pages/article-by-category", {
-    pageTitle: categoryDetail.name,
-    categoryDetail: categoryDetail,
-    articleList: articleList
-  });
-}
+};
