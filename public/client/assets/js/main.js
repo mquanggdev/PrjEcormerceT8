@@ -164,6 +164,53 @@ if(formSearch) {
     })
   }
   // End button-voice
+  // Suggest
+  const input = formSearch.querySelector(`input[name="keyword"]`);
+  const boxSuggest = formSearch.querySelector(`.inner-suggest`);
+  const boxSuggestList = boxSuggest.querySelector(`.inner-list`);
+  let timeout;
+
+  input.addEventListener("input", () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      const keyword = input.value;
+      if(keyword) {
+        fetch(`/product/suggest?keyword=${keyword}`)
+          .then(res => res.json())
+          .then(data => {
+            if(data.code == "success") {
+              const htmlArray = data.list.map(item => {
+                return `
+                  <a class="inner-item" href="/product/detail/${item.slug}">
+                    <img class="inner-image" src="${domainCDN}${item.images[0]}">
+                    <div class="inner-info">
+                      <div class="inner-name">${item.name}</div>
+                      <div class="inner-prices">
+                        <div class="inner-price-new">
+                          ${item.priceNew.toLocaleString("vi-VN")}đ
+                        </div>
+                        <div class="inner-price-old">
+                          ${item.priceOld.toLocaleString("vi-VN")}đ
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                `;
+              })
+              boxSuggestList.innerHTML = htmlArray.join("");
+              if(data.list.length > 0) {
+                boxSuggest.style.display = "block";
+              } else {
+                boxSuggest.style.display = "none";
+              }
+            }
+          })
+      } else {
+        boxSuggest.style.display = "none";
+      }
+    }, 500);
+  })
+  // End Suggest
 }
 // End form-search
 

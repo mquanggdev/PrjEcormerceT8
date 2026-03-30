@@ -207,3 +207,52 @@ export const productByCategory = async (req: Request, res: Response) => {
     pagination: pagination
   });
 }
+
+export const suggest = async (req: Request, res: Response) => {
+  const find: {
+    status: string,
+    deleted: boolean,
+    priceNew: {
+      $gt: number
+    },
+    stock: {
+      $gt: number
+    },
+    search?: RegExp
+  } = {
+    deleted: false,
+    status: "active",
+    priceNew: {
+      $gt: 0
+    },
+    stock: {
+      $gt: 0
+    }
+  };
+
+  // Từ khóa
+  if(req.query.keyword) {
+    const keyword = slugify(`${req.query.keyword}`, {
+      replacement: " ",
+      lower: true
+    });
+    const keywordRegex = new RegExp(keyword, "i");
+    find.search = keywordRegex;
+  }
+  // Hết Từ khóa
+
+  const productList = await Product
+    .find(find)
+    .limit(5)
+    .sort({
+      position: "desc"
+    })
+    .select("images name slug priceNew priceOld")
+    .lean();
+
+  res.json({
+    code: "success",
+    message: "Thành công!",
+    list: productList
+  })
+}
