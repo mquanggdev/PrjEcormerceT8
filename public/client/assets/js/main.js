@@ -145,6 +145,25 @@ if(formSearch) {
 
     window.location.href = url.href;
   })
+  
+  // button-voice
+  const buttonVoice = document.querySelector("[button-voice]");
+  if(buttonVoice) {
+    buttonVoice.addEventListener("click", () => {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const voice = new SpeechRecognition();
+      voice.lang = "vi-VN";
+      voice.start();
+      voice.onresult = (event) => {
+        const value = event.results[0][0].transcript;
+        if(value) {
+          formSearch.keyword.value = value;
+          formSearch.submit();
+        }
+      };
+    })
+  }
+  // End button-voice
 }
 // End form-search
 

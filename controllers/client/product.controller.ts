@@ -40,7 +40,7 @@ export const productByCategory = async (req: Request, res: Response) => {
     stock?: {
       $gt: number
     },
-    $or?: any,
+    $or?: any, // hoặc ở đây là hoặc của màu và kích cỡ . Nó luôn đi cùng 1 cặp nên dùng or để lọc theo giá trị của 1 cặp
     search?: RegExp
   } = {
     deleted: false,
