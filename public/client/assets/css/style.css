@@ -8366,7 +8366,7 @@ footer {
 .details_variant_size li {
     height: 25px;
     line-height: 25px;
-    width: 45px;
+    padding: 0 8px;
     background: var(--lightBg2);
     text-align: center;
     text-transform: uppercase;
@@ -8507,7 +8507,9 @@ footer {
     text-transform: capitalize;
 }
 
-.details_tags_sku li span {
+.details_tags_sku li span,
+.details_tags_sku li a
+ {
     color: var(--colorBlack);
     font-size: 15px;
     margin-right: 5px;
