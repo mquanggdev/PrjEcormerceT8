@@ -27,7 +27,8 @@ export const productByCategory = async (req: Request, res: Response) => {
     },
     stock?: {
       $gt: number
-    }
+    },
+    $or? : any
 
   } = {
     deleted: false,
@@ -45,7 +46,7 @@ export const productByCategory = async (req: Request, res: Response) => {
     };
   }
   // Hết Mức giá
-  
+
   // Đang giảm giá
   if(req.query.onSale && req.query.onSale == "true") {
     find.discount = {
@@ -62,6 +63,36 @@ export const productByCategory = async (req: Request, res: Response) => {
   }
   // Hết Còn hàng
 
+  // Thuộc tính
+  const attributeFilters: any[] = [];
+
+  Object.keys(req.query).forEach(key => {
+    if(key.startsWith("attribute_")) {
+      const attrId = key.replace("attribute_", "");
+      const values = `${req.query[key]}`.split(",");
+      
+      attributeFilters.push(
+        {
+          variants: {
+            $elemMatch: {
+              status: true,
+              attributeValue: {
+                $elemMatch: {
+                  attrId: attrId,
+                  value: { $in: values }
+                }
+              }
+            }
+          }
+        }
+      );
+
+      if(attributeFilters.length > 0) {
+        find.$or = attributeFilters;
+      }
+    }
+  })
+  // Hết Thuộc tính
 
   // Phân trang
   let limitItems = 20;
