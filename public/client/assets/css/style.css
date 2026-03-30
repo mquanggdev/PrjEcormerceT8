@@ -8236,6 +8236,10 @@ footer {
     -o-border-radius: 16px;
 }
 
+.details_slider_thumb_item img {
+    object-fit: contain !important;
+}
+
 .shop_details_text {
     padding: 0px 50px;
 }
