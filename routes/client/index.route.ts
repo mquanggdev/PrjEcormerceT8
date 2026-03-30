@@ -5,6 +5,7 @@ import articleRoutes from "./article.route";
 import * as categoryMiddleware from "../../middlewares/client/category.middleware";
 import * as attributeMiddleware from "../../middlewares/client/attribute.middleware";
 import productRoutes from "./product.route";
+import compareRoutes from "./compare.route";
 import cartRoutes from "./cart.route";
 
 const router = Router();
@@ -15,5 +16,6 @@ router.use('/', homeRoutes);
 router.use('/article', articleRoutes);
 router.use('/product', productRoutes);
 router.use('/cart', cartRoutes);
+router.use('/compare', compareRoutes);
 
 export default router;
