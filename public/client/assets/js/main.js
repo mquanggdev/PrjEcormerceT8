@@ -108,3 +108,43 @@ if(listFilterAttribute.length > 0) {
   })
 }
 // End filter-attribute
+
+// form-search
+const formSearch = document.querySelector("[form-search]");
+if(formSearch) {
+  const url = new URL(window.location.href);
+
+  // Hiển thị giá trị mặc định
+  const categoryCurrent = url.pathname.split("/").pop();
+  const keywordCurrent = url.searchParams.get("keyword");
+  
+  if(categoryCurrent && categoryCurrent != "category") {
+    formSearch.category.value = categoryCurrent;
+  }
+
+  if(keywordCurrent) {
+    formSearch.keyword.value = keywordCurrent;
+  }
+  
+  formSearch.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const category = event.target.category.value;
+    const keyword = event.target.keyword.value;
+    
+    if(category) {
+      url.pathname = `/product/category/${category}`;
+    } else {
+      url.pathname = `/product/category`;
+    }
+
+    if(keyword) {
+      url.searchParams.set("keyword", keyword);
+    } else {
+      url.searchParams.delete("keyword");
+    }
+
+    window.location.href = url.href;
+  })
+}
+// End form-search
+
