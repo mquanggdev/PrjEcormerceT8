@@ -30,6 +30,7 @@ const schema = new mongoose.Schema(
     },
     search: String,
     tags: [String],
+    boughtTogether: [String],
     deleted: {
       type: Boolean,
       default: false
