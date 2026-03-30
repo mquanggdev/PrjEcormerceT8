@@ -7,6 +7,7 @@ import * as attributeMiddleware from "../../middlewares/client/attribute.middlew
 import productRoutes from "./product.route";
 import compareRoutes from "./compare.route";
 import cartRoutes from "./cart.route";
+import wishlistRoutes from "./wishlist.route";
 
 const router = Router();
 router.use(categoryMiddleware.getAllCategory);
@@ -17,5 +18,5 @@ router.use('/article', articleRoutes);
 router.use('/product', productRoutes);
 router.use('/cart', cartRoutes);
 router.use('/compare', compareRoutes);
-
+router.use('/wishlist', wishlistRoutes);
 export default router;
