@@ -21,6 +21,12 @@ export const productByCategory = async (req: Request, res: Response) => {
     priceNew?: {
       $gte: number,
       $lte: number
+    },
+    discount?: {
+      $gt: number
+    },
+    stock?: {
+      $gt: number
     }
 
   } = {
@@ -39,6 +45,23 @@ export const productByCategory = async (req: Request, res: Response) => {
     };
   }
   // Hết Mức giá
+  
+  // Đang giảm giá
+  if(req.query.onSale && req.query.onSale == "true") {
+    find.discount = {
+      $gt: 0
+    }
+  }
+  // Hết Đang giảm giá
+
+  // Còn hàng
+  if(req.query.inStock && req.query.inStock == "true") {
+    find.stock = {
+      $gt: 0
+    }
+  }
+  // Hết Còn hàng
+
 
   // Phân trang
   let limitItems = 20;
