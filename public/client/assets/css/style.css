@@ -9086,6 +9086,13 @@ footer {
     padding: 15px 20px;
 }
 
+.single_input .just-validate-error-label {
+    position: absolute;
+    font-size: 11px;
+    bottom: 0;
+    left: 20px;
+}
+
 .single_review_input_area form button {
     margin-top: 20px;
 }
