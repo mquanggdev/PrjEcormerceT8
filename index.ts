@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
 import { configureGooglePassport } from './configs/googleOauth.config';
+import { configureFacebookPassport } from './configs/facebookOauth.config';
 
 // Load biến môi trường
 dotenv.config();
@@ -66,6 +67,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 configureGooglePassport(passport);
+configureFacebookPassport(passport);
 
 app.use("/", clientRoutes);
 app.use(`/${pathAdmin}`, adminRoutes);
