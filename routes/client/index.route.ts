@@ -9,10 +9,12 @@ import compareRoutes from "./compare.route";
 import cartRoutes from "./cart.route";
 import wishlistRoutes from "./wishlist.route";
 import authRoutes from "./auth.route";
+import * as authMiddleware from "../../middlewares/client/auth.middleware";
 
 const router = Router();
 router.use(categoryMiddleware.getAllCategory);
 router.use(attributeMiddleware.getAttributeProduct);
+router.use(authMiddleware.verifyToken);
 
 router.use('/', homeRoutes);
 router.use('/article', articleRoutes);
