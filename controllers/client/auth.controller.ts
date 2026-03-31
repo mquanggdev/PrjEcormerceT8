@@ -3,6 +3,9 @@ import AccountUser from "../../models/account-user.model";
 import bcrypt from "bcryptjs";
 import slugify from "slugify";
 import jwt from "jsonwebtoken";
+import { generateRandomNumber } from "../../helpers/generate.helper";
+import VerifyOTP from "../../models/verify-otp.model";
+import { sendMail } from "../../helpers/mail.helper";
 
 export const register = async (req: Request, res: Response) => {
   res.render("client/pages/register", {
@@ -197,4 +200,178 @@ export const callbackFacebook = async (req: Request, res: Response) => {
   });
 
   res.redirect('/');
+}
+
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  res.render("client/pages/forgot-password", {
+    pageTitle: "Quên mật khẩu"
+  });
+}
+
+export const forgotPasswordPost = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    // Kiểm tra email có tồn tại trong CSDL không
+    const existAccount = await AccountUser.findOne({
+      email: email,
+      deleted: false,
+      status: "active"
+    })
+
+    if(!existAccount) {
+      res.json({
+        code: "error",
+        message: "Email không tồn tại!"
+      });
+      return;
+    }
+
+    // Tạo mã OTP
+    const otp = generateRandomNumber(4);
+
+    // Kiểm tra email đã tồn tại trong VerifyOTP chưa
+    const existVerifyOTP = await VerifyOTP.findOne({
+      email: email,
+      type: "otp-password"
+    });
+
+    if(existVerifyOTP) {
+      res.json({
+        code: "error",
+        message: "Vui lòng gửi lại yêu cầu sau 5 phút!"
+      })
+      return;
+    }
+
+    // Lưu vào CSDL trong 5 phút
+    const newRecord = new VerifyOTP({
+      email: email,
+      otp: otp,
+      type: "otp-password",
+      expireAt: Date.now() + 5 * 60 * 1000 // 5 phút
+    });
+    await newRecord.save();
+
+    // Gửi mail tự động
+    const title = `Mã OTP lấy lại mật khẩu`;
+    const content = `Mã OTP của bạn là ${otp}. Mã OTP này sẽ hết hạn sau 5 phút. Vui lòng không chia sẻ mã OTP cho bất kỳ ai.`;
+    sendMail(email, title, content);
+
+    res.json({
+      code: "success",
+      message: "Chúng tôi đã gửi mã OTP qua email. Vui lòng kiểm tra email của bạn!"
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+export const otpPassword = async (req: Request, res: Response) => {
+  const { email } = req.query;
+
+  res.render("client/pages/otp-password", {
+    pageTitle: "Xác thực OTP",
+    email: email
+  });
+}
+
+export const otpPasswordPost = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
+
+    const existAccount = await AccountUser.findOne({
+      email: email,
+      deleted: false,
+      status: "active"
+    })
+
+    if(!existAccount) {
+      res.json({
+        code: "error",
+        message: "Email không tồn tại!"
+      })
+      return;
+    }
+
+    const existVerifyOTP = await VerifyOTP.findOne({
+      email: email,
+      otp: otp,
+      type: "otp-password"
+    })
+
+    if(!existVerifyOTP) {
+      res.json({
+        code: "error",
+        message: "Mã OTP không đúng!"
+      })
+      return;
+    }
+
+    const tokenUser = jwt.sign(
+      {
+        id: existAccount.id,
+        email: existAccount.email
+      },
+      `${process.env.JWT_SECRET}`,
+      {
+        expiresIn: "1d"
+      }
+    );
+
+    res.cookie("tokenUser", tokenUser, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 ngày
+      sameSite: "strict"
+    });
+
+    res.json({
+      code: "success",
+      message: "Xác thực mã OTP thành công. Vui lòng đổi mật khẩu mới!"
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+
+export const resetPassword = async (req: Request, res: Response) => {
+  res.render("client/pages/reset-password", {
+    pageTitle: "Đổi mật khẩu mới"
+  });
+}
+
+export const resetPasswordPost = async (req: Request, res: Response) => {
+  try {
+    const { password } = req.body;
+    const userId = res.locals.accountUser.id;
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    await AccountUser.updateOne({
+      _id: userId
+    }, {
+      password: hashPassword
+    })
+
+    res.json({
+      code: "success",
+      message: "Đã đổi mật khẩu thành công!"
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
 }
