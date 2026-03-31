@@ -24,5 +24,5 @@ router.use('/cart', cartRoutes);
 router.use('/compare', compareRoutes);
 router.use('/wishlist', wishlistRoutes);
 router.use('/auth', authRoutes);
-router.use('/dashboard', dashboardRoutes);
+router.use('/dashboard', authMiddleware.loggedIn, dashboardRoutes);
 export default router;
