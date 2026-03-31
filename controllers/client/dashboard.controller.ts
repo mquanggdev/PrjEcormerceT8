@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import AccountUser from '../../models/account-user.model';
 import slugify from 'slugify';
 import jwt from 'jsonwebtoken';
+import UserAddress from '../../models/user-address.model';
 
 export const profile = (req: Request, res: Response) => {
   res.render("client/pages/dashboard-profile", {
@@ -91,8 +92,89 @@ export const changePassword = (req: Request, res: Response) => {
     pageTitle: "Đổi mật khẩu"
   });
 }
-export const address = (req: Request, res: Response) => {
+export const address = async (req: Request, res: Response) => {
+  
+  const id = res.locals.accountUser.id;
+
+  const addressList = await UserAddress
+    .find({
+      userId: id
+    })
+    .sort({
+      createdAt: "desc"
+    })
   res.render("client/pages/dashboard-address", {
-    pageTitle: "Danh sách địa chỉ"
+    pageTitle: "Danh sách địa chỉ",
+    addressList: addressList
   });
+}
+export const addressCreate = (req: Request, res: Response) => {
+  res.render("client/pages/dashboard-address-create", {
+    pageTitle: "Thêm địa chỉ"
+  });
+}
+
+export const addressCreatePost = async (req: Request, res: Response) => {
+  try {
+    const id = res.locals.accountUser.id;
+
+    req.body.userId = id;
+
+    if(req.body.isDefault) {
+      await UserAddress.findOneAndUpdate({
+        userId: id,
+        isDefault: true
+      }, {
+        isDefault: false
+      });
+    }
+
+    const newRecord = new UserAddress(req.body);
+    await newRecord.save();
+
+    res.json({
+      code: "success",
+      message: "Thêm địa chỉ thành công!"
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+export const addressChangeDefaultPatch = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.accountUser.id;
+    const addressId = req.params.id;
+
+    // Tìm địa chỉ mặc định hiện tại để xóa mặc định
+    await UserAddress.findOneAndUpdate({
+      userId: userId,
+      isDefault: true
+    }, {
+      isDefault: false
+    });
+
+    // Đặt địa chỉ mới làm mặc định
+    await UserAddress.findOneAndUpdate({
+      _id: addressId,
+      userId: userId,
+      isDefault: false
+    }, {
+      isDefault: true
+    });
+
+    res.json({
+      code: "success",
+      message: "Đã đặt địa chỉ làm mặc định!"
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
 }
