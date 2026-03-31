@@ -1803,13 +1803,15 @@ if(resetPasswordForm) {
 
           if(data.code == "success") {
             drawNotify(data.code, data.message);
-            window.location.href = `/`;
+             const dataHrefSuccess = resetPasswordForm.getAttribute("data-href-success");
+            window.location.href = dataHrefSuccess ? dataHrefSuccess : `/`;
           }
         })
     })
   ;
 }
 // End Reset Password Form
+
 // Dashboard Profile Edit Form
 const dashboardProfileEditForm = document.querySelector("#dashboardProfileEditForm");
 if(dashboardProfileEditForm) {
