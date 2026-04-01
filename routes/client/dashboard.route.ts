@@ -2,8 +2,12 @@
 import { Router } from "express";
 import * as dashboardController from "../../controllers/client/dashboard.controller";
 import * as dashboardValidate from "../../validates/client/dashboard.validate";
+import multer from "multer";
 
 const router = Router();
+
+
+const upload = multer();
 
 router.get('/profile', dashboardController.profile);
 router.get('/profile/edit', dashboardController.profileEdit);
@@ -42,5 +46,11 @@ router.patch(
   '/address/edit/:id', 
   dashboardValidate.addressCreatePost,
   dashboardController.addressEditPatch
+);
+
+router.patch(
+  '/profile/change-avatar', 
+  upload.single("avatar"), 
+  dashboardController.profileChangeAvatarPatch
 );
 export default router;
