@@ -34,4 +34,13 @@ router.delete(
   '/address/delete/:id', 
   dashboardController.addressDelete
 );
+
+
+router.get('/address/edit/:id', dashboardController.addressEdit);
+
+router.patch(
+  '/address/edit/:id', 
+  dashboardValidate.addressCreatePost,
+  dashboardController.addressEditPatch
+);
 export default router;
