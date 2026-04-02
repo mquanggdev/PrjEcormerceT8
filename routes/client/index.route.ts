@@ -13,6 +13,7 @@ import dashboardRoutes from "./dashboard.route";
 import * as authMiddleware from "../../middlewares/client/auth.middleware";
 import couponRoutes from "./coupon.route";
 import checkoutRoutes from "./checkout.route";
+import orderRoutes from "./order.route";
 
 const router = Router();
 router.use(categoryMiddleware.getAllCategory);
@@ -29,4 +30,7 @@ router.use('/auth', authRoutes);
 router.use('/dashboard', authMiddleware.loggedIn, dashboardRoutes);
 router.use('/coupon', couponRoutes);
 router.use('/checkout', checkoutRoutes);
+router.use('/order', orderRoutes);
+
+
 export default router;
