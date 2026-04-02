@@ -12,6 +12,7 @@ import authRoutes from "./auth.route";
 import dashboardRoutes from "./dashboard.route";
 import * as authMiddleware from "../../middlewares/client/auth.middleware";
 import couponRoutes from "./coupon.route";
+import checkoutRoutes from "./checkout.route";
 
 const router = Router();
 router.use(categoryMiddleware.getAllCategory);
@@ -27,4 +28,5 @@ router.use('/wishlist', wishlistRoutes);
 router.use('/auth', authRoutes);
 router.use('/dashboard', authMiddleware.loggedIn, dashboardRoutes);
 router.use('/coupon', couponRoutes);
+router.use('/checkout', checkoutRoutes);
 export default router;
