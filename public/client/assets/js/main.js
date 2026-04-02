@@ -566,6 +566,35 @@ const drawCart = () => {
           })
 
           let discount = 0;
+          let couponDetail = sessionStorage.getItem("couponDetail");
+          if(couponDetail) {
+            couponDetail = JSON.parse(couponDetail);
+
+            // Kiểm tra giá trị đơn hàng tối thiểu
+            if (subTotal >= couponDetail.minOrderValue) {
+              if (couponDetail.typeDiscount === "percentage") {
+                discount = (subTotal * couponDetail.value) / 100;
+
+                // Giới hạn mức giảm tối đa (nếu có)
+                if (couponDetail.maxDiscountValue > 0 && discount > couponDetail.maxDiscountValue) {
+                  discount = couponDetail.maxDiscountValue;
+                }
+
+              } else if (couponDetail.typeDiscount === "fixed") {
+                discount = couponDetail.value;
+              }
+
+              const elementViewCoupon = document.querySelector("#applyCouponForm .inner-view-coupon");
+              const elementCoupon = elementViewCoupon.querySelector(".inner-coupon");
+              elementViewCoupon.style.display = "flex";
+              elementCoupon.innerHTML = couponDetail.code;
+            } else {
+              // Nếu chưa đủ điều kiện áp dụng mã
+              notyf.error(`Đơn hàng chưa đạt giá trị tối thiểu: ${couponDetail.minOrderValue}đ`);
+              sessionStorage.removeItem("couponDetail");
+            }
+          }
+
           let total = subTotal - discount;
 
           const ulMiniCart = miniCart.querySelector(".offcanvas-body ul");
@@ -2207,7 +2236,6 @@ if(dashboardAddressEditForm) {
 }
 // End Dashboard Address Edit Form
 
-
 // Profile Photo
 const profilePhoto = document.querySelector("#profile_photo");
 if(profilePhoto) {
@@ -2224,7 +2252,6 @@ if(profilePhoto) {
       })
         .then(res => res.json())
         .then(data => {
-          
           if(data.code == "error") {
             notyf.error(data.message);
           }
@@ -2242,40 +2269,62 @@ if(profilePhoto) {
 
 // Apply Coupon Form
 const applyCouponForm = document.querySelector("#applyCouponForm");
+
+function checkCoupon(coupon) {
+  const elementViewCoupon = document.querySelector("#applyCouponForm .inner-view-coupon");
+  const elementCoupon = elementViewCoupon.querySelector(".inner-coupon");
+
+  const dataFinal = {
+    coupon: coupon,
+  };
+
+  fetch(`/coupon/check`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dataFinal)
+  })
+    .then(res => res.json())
+    .then(data => {
+      if(data.code == "error") {
+        notyf.error(data.message);
+        elementViewCoupon.style.display = "none";
+        sessionStorage.removeItem("couponDetail");
+      }
+
+      if(data.code == "success") {
+        notyf.success(data.message);
+        elementViewCoupon.style.display = "flex";
+        elementCoupon.innerHTML = coupon;
+        sessionStorage.setItem("couponDetail", JSON.stringify(data.couponDetail));
+      }
+
+      drawCart();
+    })
+}
+
 if(applyCouponForm) {
+  // Thêm mã giảm giá
   applyCouponForm.addEventListener("submit", (event) => {
     event.preventDefault();
-
     const coupon = event.target.coupon.value;
-
     if(!coupon) {
       notyf.error("Vui lòng nhập mã giảm giá!");
       return;
     }
-
-    const dataFinal = {
-      coupon: coupon,
-    };
-
-    fetch(`/coupon/check`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(dataFinal)
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-
-        if(data.code == "error") {
-          notyf.error(data.message);
-        }
-
-        if(data.code == "success") {
-          notyf.success(data.message);
-        }
-      })
+    checkCoupon(coupon);
   })
+
+  // Xóa mã giảm giá
+  const buttonRemove = document.querySelector("#applyCouponForm .inner-view-coupon .inner-remove");
+  if(buttonRemove) {
+    const elementViewCoupon = document.querySelector("#applyCouponForm .inner-view-coupon");
+    buttonRemove.addEventListener("click", () => {
+      elementViewCoupon.style.display = "none";
+      sessionStorage.removeItem("couponDetail");
+      drawCart();
+    })
+  }
 }
 // End Apply Coupon Form
