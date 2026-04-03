@@ -397,28 +397,43 @@ const eventQuantityItemInCart = () => {
 // Lấy thông tin địa chỉ đã chọn
 const getUserAddress = () => {
   let userAddress = null;
-  const inputUserAddressChecked =  document.querySelector(`input[name="userAddress"]:checked`);
-  console.log(inputUserAddressChecked);
-  
+  const inputUserAddressChecked = document.querySelector(`input[name="userAddress"]:checked`);
   if(inputUserAddressChecked) {
     const dataInfo = inputUserAddressChecked.getAttribute("data-info");
     if(dataInfo) {
       userAddress = JSON.parse(dataInfo);
+    } else {
+      const inputLongitude = document.querySelector(`input[name="longitude"]`);
+      const inputLatitude = document.querySelector(`input[name="latitude"]`);
+      const longitude = inputLongitude.value;
+      const latitude = inputLatitude.value;
+      if(longitude && latitude) {
+        userAddress = {
+          longitude: parseFloat(longitude),
+          latitude: parseFloat(latitude)
+        };
+      }
     }
   }
   return userAddress;
 }
 // Hết Lấy thông tin địa chỉ đã chọn
 
+// Lựa chọn hãng vận chuyển
+const eventCheckShipping = () => {
+  const listInput = document.querySelectorAll(`[shipping-list] input[name="shippingMethod"]`);
+  listInput.forEach(input => {
+    input.addEventListener("change", () => {
+      drawCart();
+    })
+  })
+}
+// Hết Lựa chọn hãng vận chuyển
+
 // Vẽ giỏ hàng
 const drawCart = () => {
   const cart = JSON.parse(localStorage.getItem("cart"));
-
-  
-  let userAddress = getUserAddress();
-  if (!userAddress) {
-
-  }
+  const userAddress = getUserAddress();
   
   if(cart.length > 0) {
     fetch(`/cart/list`, {
@@ -428,14 +443,11 @@ const drawCart = () => {
       },
       body: JSON.stringify({
         cart: cart,
-        // userAddress: userAddress
+        userAddress: userAddress
       })
     })
       .then(res => res.json())
       .then(data => {
-        console.log(`Data : ${data.code}`);
-        console.log(`Data : ${data.shippingOptions}`);
-        
         if(data.code == "error") {
           localStorage.setItem("cart", JSON.stringify([]));
         }
@@ -444,6 +456,7 @@ const drawCart = () => {
           localStorage.setItem("cart", JSON.stringify(data.cart));
 
           let subTotal = 0;
+          let shippingFee = 0;
 
           let htmlMiniCart = "";
           let htmlCartTable = "";
@@ -452,7 +465,6 @@ const drawCart = () => {
 
           // Hiển thị sản phẩm
           data.cart.forEach(item => {
-            
             const { detail } = item;
             let priceOld = 0;
             let priceNew = 0;
@@ -599,10 +611,19 @@ const drawCart = () => {
 
           // Hiển thị hãng vận chuyển
           if(data.shippingOptions) {
+            const inputChecked = document.querySelector(`[shipping-list] [name="shippingMethod"]:checked`);
+            let idInputChecked = null;
+            if(inputChecked) {
+              idInputChecked = inputChecked.id;
+            }
+
             data.shippingOptions.forEach((item, index) => {
+              const checked = idInputChecked == `shippingMethod${index}` ? "checked" : "";
+
               htmlShipping += `
                 <div class="form-check">
                   <input 
+                    ${checked}
                     class="form-check-input" 
                     id="shippingMethod${index}" 
                     name="shippingMethod" 
@@ -618,6 +639,10 @@ const drawCart = () => {
                   </label>
                 </div>
               `;
+
+              if(checked == "checked") {
+                shippingFee = item.total_fee;
+              }
             });
           }
 
@@ -641,9 +666,11 @@ const drawCart = () => {
               }
 
               const elementViewCoupon = document.querySelector("#applyCouponForm .inner-view-coupon");
-              const elementCoupon = elementViewCoupon.querySelector(".inner-coupon");
-              elementViewCoupon.style.display = "flex";
-              elementCoupon.innerHTML = couponDetail.code;
+              if(elementViewCoupon) {
+                const elementCoupon = elementViewCoupon.querySelector(".inner-coupon");
+                elementViewCoupon.style.display = "flex";
+                elementCoupon.innerHTML = couponDetail.code;
+              }
             } else {
               // Nếu chưa đủ điều kiện áp dụng mã
               notyf.error(`Đơn hàng chưa đạt giá trị tối thiểu: ${couponDetail.minOrderValue}đ`);
@@ -651,7 +678,7 @@ const drawCart = () => {
             }
           }
 
-          let total = subTotal - discount;
+          let total = subTotal + shippingFee - discount;
 
           const ulMiniCart = miniCart.querySelector(".offcanvas-body ul");
           ulMiniCart.innerHTML = htmlMiniCart;
@@ -689,6 +716,7 @@ const drawCart = () => {
           eventRemoveItemInCart();
           eventQuantityItemInCart();
           eventCheckItemInCart();
+          eventCheckShipping();
         }
       })
   } else {
@@ -2163,6 +2191,9 @@ if(boxMap) {
 
           const inputLat = document.querySelector(`[name="latitude"]`);
           inputLat.value = lat;
+
+          // Cập nhật lại giỏ hàng
+          drawCart();
         } else {
           notyf.error("Không tìm thấy địa chỉ!");
         }
@@ -2417,6 +2448,9 @@ if(checkoutPage) {
       if(map) {
         map.updateSize();
       }
+
+      // Cập nhật lại giỏ hàng
+      drawCart();
     })
   })
 }
@@ -2428,8 +2462,6 @@ if(buttonOrder) {
   buttonOrder.addEventListener("click", () => {
     // Thông tin khách hàng
     const inputUserAddressChecked = document.querySelector(`input[name="userAddress"]:checked`);
-    console.log(inputUserAddressChecked);
-    
     if(!inputUserAddressChecked) {
       notyf.error("Vui lòng nhập địa chỉ!");
       return;
@@ -2472,14 +2504,22 @@ if(buttonOrder) {
     const inputPaymentMethodChecked = document.querySelector(`input[name="paymentMethod"]:checked`);
     const dataPaymentMethod = inputPaymentMethodChecked.value;
 
+    // Hãng vận chuyển
+    const inputShippingMethodChecked = document.querySelector(`input[name="shippingMethod"]:checked`);
+    const dataShippingMethod = inputShippingMethodChecked?.value;
+    if(!dataShippingMethod) {
+      notyf.error("Vui lòng chọn phương thức vận chuyển!");
+      return;
+    }
+
     // Dữ liệu hoàn chỉnh
     const dataFinal = {
       ...dataUser,
       items: dataCart,
       coupon: dataCoupon,
-      paymentMethod: dataPaymentMethod
+      paymentMethod: dataPaymentMethod,
+      shippingMethod: dataShippingMethod
     };
-    console.log(dataFinal);
 
     // Gửi lên backend
     fetch(`/order/create`, {
