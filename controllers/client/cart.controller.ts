@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 import Product from '../../models/product.model';
 import AttributeProduct from '../../models/attribute-product.model';
+import axios from 'axios';
 
 export const list = async (req: Request, res: Response) => {
   try {
-    const cart = req.body;
+    const { cart, userAddress } = req.body;
+
+    // Lấy chi tiết sản phẩm
     const cartDetail: any[] = [];
 
     for (const item of cart) {
@@ -39,11 +42,50 @@ export const list = async (req: Request, res: Response) => {
         cartDetail.push(itemDetail);
       }
     }
+    // Hết Lấy chi tiết sản phẩm
+
+    // Tính phí ship
+    let shippingOptions = null;
+    if(userAddress) {
+      const dataGoShip = {
+        shipment: {
+          address_from: {
+            city: "100000", // Lấy từ API: /cities
+            district: "100900", // Lấy từ API: /districs
+            ward: "113" // Lấy từ API: /wards
+          },
+          address_to: {
+            city: "100000",
+            district: "100200",
+            ward: "79"
+          },
+          parcel: {
+            cod: "500000", // Tiền thu hộ
+            amout: "500000", // Giá trị khai giá
+            weight: "220",
+            width: "1",
+            height: "1",
+            length: "1"
+          }
+        }
+      };
+
+      const goshipRes = await axios.post("https://sandbox.goship.io/api/v2/rates", dataGoShip, {
+        headers: {
+          Authorization: `Bearer ${process.env.GOSHIP_TOKEN}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      shippingOptions = goshipRes.data.data;
+    }
+    // Hết Tính phí ship
 
     res.json({
       code: "success",
       message: "Thành công!",
-      cart: cartDetail
+      cart: cartDetail,
+      shippingOptions: shippingOptions
     })
   } catch (error) {
     res.json({
@@ -52,7 +94,6 @@ export const list = async (req: Request, res: Response) => {
     })
   }
 }
-
 
 export const cart = async (req: Request, res: Response) => {
   res.render("client/pages/cart", {
