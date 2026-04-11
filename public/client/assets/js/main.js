@@ -2554,6 +2554,10 @@ if(buttonOrder) {
               // Chuyển sang trang thanh toán bằng ZaloPay
               window.location.href = `/order/payment-zalopay?orderCode=${data.orderCode}&phone=${data.phone}`;
               break;
+            case "vnpay":
+              // Chuyển sang trang thanh toán bằng VNPay
+              window.location.href = `/order/payment-vnpay?orderCode=${data.orderCode}&phone=${data.phone}`;
+              break;
             default:
               window.location.href = "/";
               break;
