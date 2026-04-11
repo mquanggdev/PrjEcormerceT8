@@ -17,4 +17,8 @@ router.get('/payment-vnpay', orderController.paymentVNPay);
 
 router.get('/payment-vnpay-result', orderController.paymentVNPayResult);
 
+router.get('/export-pdf', orderController.exportPdf);
+
+
+
 export default router;
