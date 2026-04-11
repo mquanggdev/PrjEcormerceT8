@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import UserAddress from '../../models/user-address.model';
 import FormData from 'form-data';
 import axios from 'axios';
+import Order from '../../models/order.model';
 import { domainCDN } from '../../configs/variable.config';
 
 export const profile = (req: Request, res: Response) => {
@@ -350,4 +351,23 @@ export const profileChangeAvatarPatch = async (req: Request, res: Response) => {
       message: "Dữ liệu không hợp lệ!"
     })
   }
+}
+
+
+export const orderList = async (req: Request, res: Response) => {
+  const id = res.locals.accountUser.id;
+
+  const orderList = await Order
+    .find({
+      userId: id,
+      deleted: false
+    })
+    .sort({
+      createdAt: "desc"
+    });
+  
+  res.render("client/pages/dashboard-order-list", {
+    pageTitle: "Danh sách đơn hàng",
+    orderList: orderList
+  });
 }
