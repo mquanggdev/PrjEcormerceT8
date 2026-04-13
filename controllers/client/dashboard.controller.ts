@@ -9,6 +9,7 @@ import axios from 'axios';
 import Order from '../../models/order.model';
 import { domainCDN } from '../../configs/variable.config';
 import Review from '../../models/review.model';
+import Product from '../../models/product.model';
 
 export const profile = (req: Request, res: Response) => {
   res.render("client/pages/dashboard-profile", {
@@ -538,7 +539,21 @@ export const orderReviewPost = async (req: Request, res: Response) => {
       comment: comment,
       images: imageLinks
     });
-    await newReview.save();
+    await newReview.save();// Cập nhật đánh giá cho sản phẩm
+    
+    const product = await Product.findOne({
+      _id: productId,
+      deleted: false
+    });
+    if(product) {
+      const newRatingCount = product.ratingCount + 1;
+      const newRatingAvg = ((product.ratingAvg * product.ratingCount) + parseInt(rating)) / newRatingCount;
+      product.ratingAvg = newRatingAvg;
+      product.ratingCount = newRatingCount;
+      await product.save();
+    }
+    // Hết Cập nhật đánh giá cho sản phẩm
+
 
     res.json({
       code: "success",

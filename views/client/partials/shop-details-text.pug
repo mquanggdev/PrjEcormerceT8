@@ -1,3 +1,5 @@
+include ../mixins/stars.pug
+
 div(class="shop_details_text")
   script.
     const productVariants = !{JSON.stringify(productDetail.variants)};
@@ -9,12 +11,8 @@ div(class="shop_details_text")
     else
       p(class="out_stock stock") Hết hàng
     p.rating
-      i.fas.fa-star
-      i.fas.fa-star
-      i.fas.fa-star
-      i.fas.fa-star
-      i.fas.fa-star
-      span (0 Đánh giá)
+      +stars(productDetail)
+      span (#{productDetail.ratingCount} Đánh giá)
   h3.price
     div.price-new #{productDetail.priceNew.toLocaleString("vi-VN")}đ
     del.price-old #{productDetail.priceOld.toLocaleString("vi-VN")}đ
@@ -71,7 +69,7 @@ div(class="shop_details_text")
         href="javascript:;"
         button-add-wishlist
         product-id=productDetail.id
-        )
+      )
         i.fal.fa-heart
         | Yêu thích
     li
