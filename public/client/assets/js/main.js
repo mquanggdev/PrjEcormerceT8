@@ -678,7 +678,12 @@ const drawCart = () => {
             }
           }
 
-          let total = subTotal + shippingFee - discount;
+          let pointDiscount = 0;
+          if(data.point && data.point.canUsePoint) {
+            pointDiscount = data.point.canUsePoint * data.point.POINT_TO_MONEY;
+          }
+
+          let total = subTotal + shippingFee - discount - pointDiscount;
 
           const ulMiniCart = miniCart.querySelector(".offcanvas-body ul");
           ulMiniCart.innerHTML = htmlMiniCart;
@@ -701,6 +706,11 @@ const drawCart = () => {
           const elementDiscount = document.querySelector("[discount]");
           if(elementDiscount) {
             elementDiscount.innerHTML = discount.toLocaleString("vi-VN");
+          }
+
+          const elementPointDiscount = document.querySelector("[point-discount]");
+          if(elementPointDiscount) {
+            elementPointDiscount.innerHTML = pointDiscount.toLocaleString("vi-VN");
           }
 
           const elementTotal = document.querySelector("[total]");
@@ -2568,7 +2578,6 @@ if(buttonOrder) {
 }
 // End Button Order
 
-
 // Viết đánh giá
 const listButtonReview = document.querySelectorAll("[data-bs-target='#modalReview']");
 if(listButtonReview.length > 0) {
@@ -2665,7 +2674,6 @@ if(listButtonReview.length > 0) {
   })
 }
 // Hết Viết đánh giá
-
 
 // filterRating
 const listInputFilterRating = document.querySelectorAll(`.sidebar_rating input[name="rating"]`);
