@@ -205,12 +205,27 @@ export const productByCategory = async (req: Request, res: Response) => {
   for (const item of productList) {
     formatProductItem(item);
   }
+  
+  // Sản phẩm được đánh giá cao
+  const topRatedProducts: any = await Product
+    .find({
+      deleted: false,
+      status: "active",
+      ratingAvg: { $gte: 4 }
+    })
+    .sort({
+      ratingAvg: "desc"
+    })
+    .limit(5)
+    .lean();
+  // Hết Sản phẩm được đánh giá cao
 
   res.render("client/pages/product-by-category", {
     pageTitle: categoryDetail.name,
     categoryDetail: categoryDetail,
     productList: productList,
-    pagination: pagination
+    pagination: pagination,
+    topRatedProducts: topRatedProducts
   });
 }
 
