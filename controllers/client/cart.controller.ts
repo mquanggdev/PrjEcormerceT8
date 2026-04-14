@@ -4,6 +4,7 @@ import AttributeProduct from '../../models/attribute-product.model';
 import axios from 'axios';
 import { getInfoAddress } from '../../helpers/location.helper';
 import { pointConfig } from '../../configs/variable.config';
+import { getApiShipping } from '../../configs/setting.config';
 
 export const list = async (req: Request, res: Response) => {
   try {
@@ -85,9 +86,11 @@ export const list = async (req: Request, res: Response) => {
         }
       };
 
+      const apiShipping = await getApiShipping();
+
       const goshipRes = await axios.post("https://sandbox.goship.io/api/v2/rates", dataGoShip, {
         headers: {
-          Authorization: `Bearer ${process.env.GOSHIP_TOKEN}`,
+          Authorization: `Bearer ${apiShipping.tokenGoShip}`,
           "Content-Type": "application/json"
         }
       });
@@ -96,7 +99,7 @@ export const list = async (req: Request, res: Response) => {
     }
     // Hết Tính phí ship
 
-        // Trả thêm điểm của người dùng
+    // Trả thêm điểm của người dùng
     const point = {
       canUsePoint: 0,
       POINT_TO_MONEY: pointConfig.POINT_TO_MONEY
@@ -105,7 +108,6 @@ export const list = async (req: Request, res: Response) => {
       point.canUsePoint = res.locals.accountUser.totalPoint - res.locals.accountUser.usedPoint;
     }
     // Hết Trả thêm điểm của người dùng
-
 
     res.json({
       code: "success",
