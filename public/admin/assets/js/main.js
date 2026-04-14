@@ -1,35 +1,21 @@
 // Khởi tạo TinyMCE
 const initialTinyMCE = () => {
   tinymce.init({
-    selector: "[textarea-mce]",
+    selector: '[textarea-mce]',
     plugins: [
-      'anchor', 'autolink', 'charmap', 'codesample',
-      'emoticons', 'link', 'lists', 'media',
-      'searchreplace', 'table', 'visualblocks',
-      'wordcount', 'image', 'code'
+      'accordion', 'anchor', "link", 'autolink', 'autoresize', 'image', 'media'
     ],
-    toolbar: `
-      undo redo |
-      blocks fontfamily fontsize |
-      bold italic underline strikethrough |
-      link media image table |
-      align |
-      numlist bullist indent outdent |
-      emoticons charmap |
-      removeformat |
-      code
-    `,
     init_instance_callback: (editor) => {
       editor.on("OpenWindow", () => {
         const title = document.querySelector(".tox .tox-dialog__title")?.innerHTML;
         if(title == "Insert/Edit Media" || title == "Insert/Edit Image") {
           const inputSource = document.querySelector(`.tox input.tox-textfield[type="url"]`);
-          if(inputSource) inputSource.value = domainCDN;
+          inputSource.value = domainCDN;
         }
-      });
+      })
     }
   });
-};
+}
 initialTinyMCE();
 // Hết Khởi tạo TinyMCE
 
@@ -37,51 +23,46 @@ initialTinyMCE();
 var notyf = new Notyf({
   duration: 3000,
   position: {
-    x: "right",
-    y: "top",
+    x:'right',
+    y:'top'
   },
-  dismissible: true,
+  dismissible: true
 });
 
 const notifyData = sessionStorage.getItem("notify");
-if (notifyData) {
+if(notifyData) {
   const { type, message } = JSON.parse(notifyData);
-  if (type == "error") {
+  if(type == "error") {
     notyf.error(message);
-  } else if (type == "success") {
+  } else if(type == "success") {
     notyf.success(message);
   }
   sessionStorage.removeItem("notify");
 }
 
 const drawNotify = (type, message) => {
-  sessionStorage.setItem(
-    "notify",
-    JSON.stringify({
-      type: type,
-      message: message,
-    }),
-  );
-};
+  sessionStorage.setItem("notify", JSON.stringify({
+    type: type,
+    message: message
+  }));
+}
 
 // articleCreateCategoryForm
-const articleCreateCategoryForm = document.querySelector(
-  "#articleCreateCategoryForm",
-);
-if (articleCreateCategoryForm) {
-  const validator = new JustValidate("#articleCreateCategoryForm");
+const articleCreateCategoryForm = document.querySelector("#articleCreateCategoryForm");
+if(articleCreateCategoryForm) {
+  const validator = new JustValidate('#articleCreateCategoryForm');
 
   validator
-    .addField("#name", [
+    .addField('#name', [
       {
-        rule: "required",
-        errorMessage: "Vui lòng nhập tên danh mục!",
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên danh mục!',
       },
     ])
-    .addField("#slug", [
+    .addField('#slug', [
       {
-        rule: "required",
-        errorMessage: "Vui lòng nhập đường dẫn!",
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập đường dẫn!',
       },
     ])
     .onSuccess((event) => {
@@ -103,76 +84,39 @@ if (articleCreateCategoryForm) {
 
       fetch(`/${pathAdmin}/article/category/create`, {
         method: "POST",
-        body: formData,
+        body: formData
       })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.code == "error") {
+        .then(res => res.json())
+        .then(data => {
+          if(data.code == "error") {
             notyf.error(data.message);
           }
 
-          if (data.code == "success") {
+          if(data.code == "success") {
             drawNotify(data.code, data.message);
             location.reload();
           }
-        });
+        })
     });
 }
 // End articleCreateCategoryForm
 
-// btn-generate-slug
-const buttonGenerateSlug = document.querySelector("[btn-generate-slug]");
-if (buttonGenerateSlug) {
-  buttonGenerateSlug.addEventListener("click", () => {
-    const modalName = buttonGenerateSlug.getAttribute("btn-generate-slug");
-    const from = buttonGenerateSlug.getAttribute("from");
-    const to = buttonGenerateSlug.getAttribute("to");
-    const string = document.querySelector(`[name="${from}"]`).value;
-
-    const dataFinal = {
-      string: string,
-      modalName: modalName,
-    };
-
-    fetch(`/${pathAdmin}/helper/generate-slug`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataFinal),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.code == "error") {
-          notyf.error(data.message);
-        }
-
-        if (data.code == "success") {
-          document.querySelector(`[name="${to}"]`).value = data.slug;
-        }
-      });
-  });
-}
-// End btn-generate-slug
-
 // articleEditCategoryForm
-const articleEditCategoryForm = document.querySelector(
-  "#articleEditCategoryForm",
-);
-if (articleEditCategoryForm) {
-  const validator = new JustValidate("#articleEditCategoryForm");
+const articleEditCategoryForm = document.querySelector("#articleEditCategoryForm");
+if(articleEditCategoryForm) {
+  const validator = new JustValidate('#articleEditCategoryForm');
 
   validator
-    .addField("#name", [
+    .addField('#name', [
       {
-        rule: "required",
-        errorMessage: "Vui lòng nhập tên danh mục!",
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập tên danh mục!',
       },
     ])
-    .addField("#slug", [
+    .addField('#slug', [
       {
-        rule: "required",
-        errorMessage: "Vui lòng nhập đường dẫn!",
+        rule: 'required',
+        errorMessage: 'Vui lòng nhập đường dẫn!',
       },
     ])
     .onSuccess((event) => {
@@ -181,7 +125,7 @@ if (articleEditCategoryForm) {
       const slug = event.target.slug.value;
       const parent = event.target.parent.value;
       const status = event.target.status.value;
-      const avatar = event.target.avatar.value
+      const avatar = event.target.avatar.value;
       const description = tinymce.get("description").getContent();
 
       // Tạo formData
@@ -195,68 +139,103 @@ if (articleEditCategoryForm) {
 
       fetch(`/${pathAdmin}/article/category/edit/${id}`, {
         method: "PATCH",
-        body: formData,
+        body: formData
       })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.code == "error") {
+        .then(res => res.json())
+        .then(data => {
+          if(data.code == "error") {
             notyf.error(data.message);
           }
 
-          if (data.code == "success") {
+          if(data.code == "success") {
             notyf.success(data.message);
           }
-        });
+        })
     });
 }
 // End articleEditCategoryForm
 
+// btn-generate-slug
+const buttonGenerateSlug = document.querySelector("[btn-generate-slug]");
+if(buttonGenerateSlug) {
+  buttonGenerateSlug.addEventListener("click", () => {
+    const modalName = buttonGenerateSlug.getAttribute("btn-generate-slug");
+    const from = buttonGenerateSlug.getAttribute("from");
+    const to = buttonGenerateSlug.getAttribute("to");
+    const string = document.querySelector(`[name="${from}"]`).value;
+    
+    const dataFinal = {
+      string: string,
+      modalName: modalName
+    };
+
+    fetch(`/${pathAdmin}/helper/generate-slug`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(dataFinal)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if(data.code == "error") {
+          notyf.error(data.message);
+        }
+
+        if(data.code == "success") {
+          document.querySelector(`[name="${to}"]`).value = data.slug;
+        }
+      })
+  })
+}
+// End btn-generate-slug
+
 // button-api
 const listButtonApi = document.querySelectorAll("[button-api]");
-if (listButtonApi.length > 0) {
-  listButtonApi.forEach((button) => {
+if(listButtonApi.length > 0) {
+  listButtonApi.forEach(button => {
     button.addEventListener("click", () => {
       const method = button.getAttribute("data-method");
       const api = button.getAttribute("data-api");
 
       fetch(api, {
-        method: method || "GET",
+        method: method || "GET"
       })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.code == "error") {
+        .then(res => res.json())
+        .then(data => {
+          if(data.code == "error") {
             notyf.error(data.message);
           }
 
-          if (data.code == "success") {
+          if(data.code == "success") {
             drawNotify(data.code, data.message);
             location.reload();
           }
-        });
-    });
-  });
+        })
+    })
+  })
 }
 // End button-api
 
 // form-search
 const formSearch = document.querySelector("[form-search]");
-if (formSearch) {
+if(formSearch) {
   const url = new URL(window.location.href);
 
   formSearch.addEventListener("submit", (event) => {
     event.preventDefault();
     const value = event.target.keyword.value;
-    if (value) {
+    if(value) {
       url.searchParams.set("keyword", value);
     } else {
       url.searchParams.delete("keyword");
     }
     window.location.href = url.href;
-  });
+  })
 
   // Hiển thị giá trị mặc định
   const valueCurrent = url.searchParams.get("keyword");
-  if (valueCurrent) {
+  if(valueCurrent) {
     formSearch.keyword.value = valueCurrent;
   }
 }
@@ -264,22 +243,22 @@ if (formSearch) {
 
 // pagination
 const pagination = document.querySelector("[pagination]");
-if (pagination) {
+if(pagination) {
   const url = new URL(window.location.href);
 
   pagination.addEventListener("change", () => {
     const value = pagination.value;
-    if (value) {
+    if(value) {
       url.searchParams.set("page", value);
     } else {
       url.searchParams.delete("page");
     }
     window.location.href = url.href;
-  });
+  })
 
   // Hiển thị giá trị mặc định
   const valueCurrent = url.searchParams.get("page");
-  if (valueCurrent) {
+  if(valueCurrent) {
     pagination.value = valueCurrent;
   }
 }
@@ -287,68 +266,69 @@ if (pagination) {
 
 // button-copy
 const listButtonCopy = document.querySelectorAll("[button-copy]");
-if (listButtonCopy.length > 0) {
-  listButtonCopy.forEach((button) => {
+if(listButtonCopy.length > 0) {
+  listButtonCopy.forEach(button => {
     button.addEventListener("click", () => {
       const content = button.getAttribute("data-content");
       window.navigator.clipboard.writeText(content);
       notyf.success("Đã copy!");
-    });
-  });
+    })
+  })
 }
 // End button-copy
 
 // Modal Preview File
 const modalPreviewFile = document.querySelector("#modalPreviewFile");
-if (modalPreviewFile) {
+if(modalPreviewFile) {
   const innerPreview = modalPreviewFile.querySelector(".inner-preview");
 
   // Sự kiện click button
   let buttonClicked = null;
 
-  const listButtonPreviewFile = document.querySelectorAll(
-    "[button-preview-file]",
-  );
-  listButtonPreviewFile.forEach((button) => {
+  const listButtonPreviewFile = document.querySelectorAll("[button-preview-file]");
+  listButtonPreviewFile.forEach(button => {
     button.addEventListener("click", () => {
       buttonClicked = button;
-    });
-  });
+    })
+  })
 
   // Sự kiện đóng modal
-  modalPreviewFile.addEventListener("hidden.bs.modal", (event) => {
+  modalPreviewFile.addEventListener('hidden.bs.modal', event => {
     buttonClicked = null;
     innerPreview.innerHTML = "";
-  });
+  })
 
   // Sự kiện mở modal
-  modalPreviewFile.addEventListener("shown.bs.modal", (event) => {
+  modalPreviewFile.addEventListener('shown.bs.modal', event => {
     const file = buttonClicked.getAttribute("data-file");
     const mimetype = buttonClicked.getAttribute("data-mimetype");
 
     // Nếu là file ảnh
-    if (mimetype.includes("image")) {
+    if(mimetype.includes("image")) {
       innerPreview.innerHTML = `
         <img src="${file}" width="100%" />
       `;
-    } else if (mimetype.includes("audio")) {
+    }
+    else if(mimetype.includes("audio")) {
       innerPreview.innerHTML = `
         <audio controls>
           <source src="${file}" />
         </audio>
       `;
-    } else if (mimetype.includes("video")) {
+    }
+    else if(mimetype.includes("video")) {
       innerPreview.innerHTML = `
         <video controls width="100%">
           <source src="${file}" />
         </video>
       `;
-    } else if (mimetype.includes("application/pdf")) {
+    }
+    else if(mimetype.includes("application/pdf")) {
       innerPreview.innerHTML = `
         <iframe src="${file}" width="100%" height="600px"></iframe>
       `;
     }
-  });
+  })
 }
 // End Modal Preview File
 
@@ -413,6 +393,7 @@ if(modalChangeFileName) {
   })
 }
 // End Modal Change File Name
+
 // Button Delete File
 const listButtonDeleteFile = document.querySelectorAll("[button-delete-file]");
 if(listButtonDeleteFile.length > 0) {
@@ -442,6 +423,7 @@ if(listButtonDeleteFile.length > 0) {
   })
 }
 // End Button Delete File
+
 // Form Create Folder
 const formCreateFolder = document.querySelector("[form-create-folder]");
 if(formCreateFolder) {
@@ -456,7 +438,7 @@ if(formCreateFolder) {
     // Tạo formData
     const formData = new FormData();
     formData.append("folderName", folderName);
-    
+
     const urlParams = new URLSearchParams(window.location.search);
     const folderPath = urlParams.get("folderPath");
     if(folderPath) {
@@ -505,6 +487,7 @@ if(listButtonToFolder.length > 0) {
   })
 }
 // End Button To Folder
+
 // Breadcrumb Folder
 const breadcumbFolder = document.querySelector("[breadcumb-folder]");
 if(breadcumbFolder) {
@@ -524,7 +507,6 @@ if(breadcumbFolder) {
   let path = "";
   listFolder.forEach((item, index) => {
     path += (index > 0 ? "/" : "") + listFolder[index];
-    console.log(path);
 
     htmls += `
       <li class="list-group-item bg-white">
@@ -576,27 +558,26 @@ if(listButtonDeleteFolder.length > 0) {
 }
 // End Button Delete Folder
 
-
-
 // Form Group File
-const formGroupFile = document.querySelector("[form-group-file]");
-if(formGroupFile) {
-  const inputFile = formGroupFile.querySelector("[input-file]");
-  const previewFile = formGroupFile.querySelector("[preview-file]");
+const listFormGroupFile = document.querySelectorAll("[form-group-file]");
+if(listFormGroupFile.length > 0) {
+  listFormGroupFile.forEach(formGroupFile => {
+    const inputFile = formGroupFile.querySelector("[input-file]");
+    const previewFile = formGroupFile.querySelector("[preview-file]");
 
-  inputFile.addEventListener("input", () => {
-    const value = inputFile.value;
-    previewFile.querySelector("img").src = `${domainCDN}${value}`;
+    inputFile.addEventListener("input", () => {
+      const value = inputFile.value;
+      previewFile.querySelector("img").src = `${domainCDN}${value}`;
+    })
+
+    // Hiển thị mặc định
+    if(inputFile.value) {
+      const value = inputFile.value;
+      previewFile.querySelector("img").src = `${domainCDN}${value}`;
+    }
   })
-
-  // Hiển thị mặc định
-  if(inputFile.value) {
-    const value = inputFile.value;
-    previewFile.querySelector("img").src = `${domainCDN}${value}`;
-  }
 }
 // End Form Group File
-
 
 // Checkbox List
 const getCheckboxList = (name) => {
@@ -647,7 +628,6 @@ const getOptionList = (name) => {
   return dataFinal;
 }
 // End Option List
-
 
 // Article Create Form
 const articleCreateForm = document.querySelector("#articleCreateForm");
@@ -705,7 +685,6 @@ if(articleCreateForm) {
   ;
 }
 // End Article Create Form
-
 
 // Article Edit Form
 const articleEditForm = document.querySelector("#articleEditForm");
@@ -809,7 +788,6 @@ if(roleCreateForm) {
 }
 // End Role Create Form
 
-
 // Role Edit Form
 const roleEditForm = document.querySelector("#roleEditForm");
 if(roleEditForm) {
@@ -854,7 +832,6 @@ if(roleEditForm) {
   ;
 }
 // End Role Edit Form
-
 
 // Account Admin Create Form
 const accountAdminCreateForm = document.querySelector("#accountAdminCreateForm");
@@ -951,8 +928,6 @@ if(accountAdminCreateForm) {
 }
 // End Account Admin Create Form
 
-
-
 // Account Admin Edit Form
 const accountAdminEditForm = document.querySelector("#accountAdminEditForm");
 if(accountAdminEditForm) {
@@ -1020,7 +995,6 @@ if(accountAdminEditForm) {
 }
 // End Account Admin Edit Form
 
-
 // Account Admin Change Password Form
 const accountAdminChangePasswordForm = document.querySelector("#accountAdminChangePasswordForm");
 if(accountAdminChangePasswordForm) {
@@ -1080,7 +1054,6 @@ if(accountAdminChangePasswordForm) {
 }
 // End Account Admin Change Password Form
 
-
 // Account Login Form
 const accountLoginForm = document.querySelector("#accountLoginForm");
 if(accountLoginForm) {
@@ -1133,7 +1106,6 @@ if(accountLoginForm) {
   ;
 }
 // End Account Login Form
-
 
 // Product Create Category Form
 const productCreateCategoryForm = document.querySelector("#productCreateCategoryForm");
@@ -1190,7 +1162,6 @@ if(productCreateCategoryForm) {
 }
 // End Product Create Category Form
 
-
 // productEditCategoryForm
 const productEditCategoryForm = document.querySelector("#productEditCategoryForm");
 if(productEditCategoryForm) {
@@ -1244,6 +1215,7 @@ if(productEditCategoryForm) {
     });
 }
 // End productEditCategoryForm
+
 // Product Create Form
 const productCreateForm = document.querySelector("#productCreateForm");
 if(productCreateForm) {
@@ -1274,7 +1246,8 @@ if(productCreateForm) {
       const priceOld = event.target.priceOld.value;
       const priceNew = event.target.priceNew.value;
       const stock = event.target.stock.value;
-      const attributes = getCheckboxList("attributes");      
+      const attributes = getCheckboxList("attributes");
+
       // variants
       const variants = [];
       const listTr = document.querySelectorAll("[variant-table] tbody tr");
@@ -1291,7 +1264,6 @@ if(productCreateForm) {
         } else {
           priceNew = priceOld;
         }
-        
         let stock = tr.querySelector("[stock]").value;
         if(stock) {
           stock = parseInt(stock);
@@ -1307,20 +1279,16 @@ if(productCreateForm) {
         });
       })
       // End variants
-      
+
       // tags
       const selectTag = document.querySelector(`select[name="tags"]`);
       const tags = Array.from(selectTag.selectedOptions).map(option => option.value);
       // End tags
 
-
       // boughtTogether
       const selectBoughtTogether = document.querySelector(`select[name="boughtTogether"]`);
       const boughtTogether = Array.from(selectBoughtTogether.selectedOptions).map(option => option.value);
       // End boughtTogether
-
-
-
 
       // Tạo FormData
       const formData = new FormData();
@@ -1340,8 +1308,6 @@ if(productCreateForm) {
       formData.append("tags", JSON.stringify(tags));
       formData.append("boughtTogether", JSON.stringify(boughtTogether));
       
-
-
       fetch(`/${pathAdmin}/product/create`, {
         method: "POST",
         body: formData
@@ -1361,6 +1327,7 @@ if(productCreateForm) {
   ;
 }
 // End Product Create Form
+
 // Product Edit Form
 const productEditForm = document.querySelector("#productEditForm");
 if(productEditForm) {
@@ -1453,7 +1420,7 @@ if(productEditForm) {
       formData.append("variants", JSON.stringify(variants));
       formData.append("tags", JSON.stringify(tags));
       formData.append("boughtTogether", JSON.stringify(boughtTogether));
-
+      
       fetch(`/${pathAdmin}/product/edit/${id}`, {
         method: "PATCH",
         body: formData
@@ -1636,7 +1603,6 @@ if(productCreateAttributeForm) {
 }
 // End Product Create Attribute Form
 
-
 // Product Edit Attribute Form
 const productEditAttributeForm = document.querySelector("#productEditAttributeForm");
 if(productEditAttributeForm) {
@@ -1705,7 +1671,7 @@ if(buttonRenderVariant) {
     const idList = getCheckboxList(attr);
     const attributeListChecked = attributeList.filter(item => idList.includes(item._id));
     const variantList = generateVariants(attributeListChecked);
-    
+
     // Lấy ra bảng
     const variantTable = document.querySelector("[variant-table]");
 
@@ -1766,8 +1732,8 @@ if(buttonRenderVariant) {
   })
 }
 // End button-render-variant
-// select-tag
 
+// select-tag
 const listSelectTag = document.querySelectorAll("[select-tag]");
 if(listSelectTag.length > 0) {
   listSelectTag.forEach(selectTag => {
@@ -1775,20 +1741,21 @@ if(listSelectTag.length > 0) {
 
     new Selectr(selectTag, {
       taggable: taggable == "false" ? false : true
-  });
-
-  // Ngăn chặn sự kiện submit form
-const inputTag = selectTag.closest(".selectr-container").querySelector(".selectr-tag-input");
-  if(inputTag) {
-    inputTag.addEventListener("keydown", (event) => {
-      if(event.key == "Enter") {
-        event.preventDefault();
-      }
     });
+
+    // Ngăn chặn sự kiện submit form
+    const inputTag = selectTag.closest(".selectr-container").querySelector(".selectr-tag-input");
+    if(inputTag) {
+      inputTag.addEventListener("keydown", (event) => {
+        if(event.key == "Enter") {
+          event.preventDefault();
+        }
+      });
     }
   })
 }
 // End select-tag
+
 // formImportExcel
 const formImportExcel = document.querySelector("#formImportExcel");
 if(formImportExcel) {
@@ -1840,6 +1807,7 @@ if(formImportExcel) {
   ;
 }
 // End formImportExcel
+
 // date-range
 const dateRange = document.querySelector("[date-range]");
 if(dateRange) {
@@ -1915,7 +1883,6 @@ if(couponCreateForm) {
   ;
 }
 // End Coupon Create Form
-
 
 // Coupon Edit Form
 const couponEditForm = document.querySelector("#couponEditForm");
@@ -1998,7 +1965,6 @@ if(listFormatMoney.length > 0) {
   })
 }
 // End format-money
-
 
 // Setting Api Shipping Form
 const settingApiShippingForm = document.querySelector("#settingApiShippingForm");
@@ -2083,6 +2049,7 @@ if(settingApiPaymentForm) {
   ;
 }
 // End Setting Api Payment Form
+
 // Setting Api Login Social Form
 const settingApiLoginSocialForm = document.querySelector("#settingApiLoginSocialForm");
 if(settingApiLoginSocialForm) {
@@ -2129,8 +2096,6 @@ if(settingApiLoginSocialForm) {
 }
 // End Setting Api Login Social Form
 
-
-
 // Setting Api App Password Form
 const settingApiAppPasswordForm = document.querySelector("#settingApiAppPasswordForm");
 if(settingApiAppPasswordForm) {
@@ -2168,3 +2133,43 @@ if(settingApiAppPasswordForm) {
   ;
 }
 // End Setting Api App Password Form
+
+// Setting General Form
+const settingGeneralForm = document.querySelector("#settingGeneralForm");
+if(settingGeneralForm) {
+  const validation = new JustValidate('#settingGeneralForm');
+
+  validation
+    .onSuccess((event) => {
+      const domainWebsite = event.target.domainWebsite.value;
+      const logo = event.target.logo.value;
+      const favicon = event.target.favicon.value;
+
+      // Tạo dataFinal
+      const dataFinal = {
+        domainWebsite: domainWebsite,
+        logo: logo,
+        favicon: favicon,
+      };
+      
+      fetch(`/${pathAdmin}/setting/general`, {
+        method: "PATCH",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataFinal),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if(data.code == "error") {
+            notyf.error(data.message);
+          }
+
+          if(data.code == "success") {
+            notyf.success(data.message);
+          }
+        })
+    })
+  ;
+}
+// End Setting General Form
