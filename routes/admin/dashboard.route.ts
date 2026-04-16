@@ -7,6 +7,6 @@ const router = Router();
 
 router.get('/',checkPermission("dashboard"), dashboardController.dashboard);
 router.get('/revenue-by-time', dashboardController.revenueByTime);
-
+router.get('/order-statistic', dashboardController.orderStatistic);
 
 export default router;
