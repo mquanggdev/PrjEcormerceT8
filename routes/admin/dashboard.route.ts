@@ -6,5 +6,7 @@ import { checkPermission } from "../../middlewares/admin/auth.middleware";
 const router = Router();
 
 router.get('/',checkPermission("dashboard"), dashboardController.dashboard);
+router.get('/revenue-by-time', dashboardController.revenueByTime);
+
 
 export default router;
