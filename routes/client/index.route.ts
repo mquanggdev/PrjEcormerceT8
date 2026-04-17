@@ -14,11 +14,13 @@ import * as authMiddleware from "../../middlewares/client/auth.middleware";
 import couponRoutes from "./coupon.route";
 import checkoutRoutes from "./checkout.route";
 import orderRoutes from "./order.route";
+import * as seoMiddleware from "../../middlewares/client/seo.middleware";
 
 const router = Router();
 router.use(categoryMiddleware.getAllCategory);
 router.use(attributeMiddleware.getAttributeProduct);
 router.use(authMiddleware.verifyToken);
+router.use(seoMiddleware.canonical);
 
 router.use('/', homeRoutes);
 router.use('/article', articleRoutes);
