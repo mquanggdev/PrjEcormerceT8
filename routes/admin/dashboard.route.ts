@@ -8,5 +8,6 @@ const router = Router();
 router.get('/',checkPermission("dashboard"), dashboardController.dashboard);
 router.get('/revenue-by-time', dashboardController.revenueByTime);
 router.get('/order-statistic', dashboardController.orderStatistic);
+router.get('/top-selling-products', dashboardController.topSellingProducts);
 
 export default router;
