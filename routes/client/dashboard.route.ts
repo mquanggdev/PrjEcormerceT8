@@ -9,6 +9,9 @@ const router = Router();
 
 const upload = multer();
 
+
+router.get('/', dashboardController.dashboard);
+
 router.get('/profile', dashboardController.profile);
 router.get('/profile/edit', dashboardController.profileEdit);
 
