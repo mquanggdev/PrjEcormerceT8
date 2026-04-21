@@ -33,15 +33,32 @@ $(function () {
 
 
     //=======Simply Countdown======   
-    var d = new Date(),
-        countUpDate = new Date();
-    d.setDate(d.getDate() + 365);
-    simplyCountdown('.simply-countdown-one', {
-        year: d.getFullYear(),
-        month: d.getMonth() + 1,
-        day: d.getDate(),
-        enableUtc: true
-    });
+    // var d = new Date(),
+    //     countUpDate = new Date();
+    // d.setDate(d.getDate() + 365);
+    // simplyCountdown('.simply-countdown-one', {
+    //     year: d.getFullYear(),
+    //     month: d.getMonth() + 1,
+    //     day: d.getDate(),
+    //     enableUtc: true
+    // });
+
+
+    const simplyCountdownOne = document.querySelector('.simply-countdown-one');
+    if(simplyCountdownOne) {
+        const endTime = simplyCountdownOne.getAttribute("data-end-time");
+        if (!endTime) return;
+        const endDate = new Date(endTime);
+        simplyCountdown('.simply-countdown-one', {
+            year: endDate.getFullYear(),
+            month: endDate.getMonth() + 1,
+            day: endDate.getDate(),
+            hours: endDate.getHours(),
+            minutes: endDate.getMinutes(),
+            seconds: endDate.getSeconds(),
+            enableUtc: true
+        });
+    }
 
 
     //======countUp js=========   
@@ -727,7 +744,6 @@ $(function () {
     //=====RANGE SLIDER===== 
     $('.basic').alRangeSlider();
     
-
     // range_slider
     const rangeSlider = document.querySelector(".range_slider");
     if(rangeSlider) {
@@ -744,8 +760,9 @@ $(function () {
             initialSelectedValues.from = from;
             initialSelectedValues.to = to;
         }
-    const options = {
-                range: {
+
+        const options = {
+            range: {
                 min: 0, 
                 max: 50000000, // 50 triệu
                 step: 10000 // bước nhảy 10.000đ
@@ -765,9 +782,12 @@ $(function () {
                 }
                 window.location.href = url.href;
             }
-        }
-    $('.range_slider').alRangeSlider(options);
-};
+        };
+
+        $('.range_slider').alRangeSlider(options);
+    }
+    // End range_slider
+    
     const options2 = {
         orientation: "vertical"
     };
