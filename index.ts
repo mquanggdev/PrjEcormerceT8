@@ -12,11 +12,19 @@ import passport from "passport";
 import { configureGooglePassport } from './configs/googleOauth.config';
 import { configureFacebookPassport } from './configs/facebookOauth.config';
 
+import { Server } from 'socket.io';
+import { createServer } from 'node:http';
+import { initSocket } from './sockets/index.socket';
+
 // Load biến môi trường
 dotenv.config();
 
 const app = express();
 const port = 3000;
+
+// Khởi tạo SocketIO bên Server
+const server = createServer(app);
+const io = new Server(server);
 
 connectDB();
 
@@ -72,6 +80,9 @@ configureFacebookPassport(passport);
 app.use("/", clientRoutes);
 app.use(`/${pathAdmin}`, adminRoutes);
 
-app.listen(port, () => {
+// Khởi tạo Socket bên Server
+initSocket(io);
+
+server.listen(port, () => {
   console.log(`Website đang chạy trên cổng ${port}`);
 });
