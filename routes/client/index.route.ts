@@ -17,6 +17,7 @@ import orderRoutes from "./order.route";
 import * as seoMiddleware from "../../middlewares/client/seo.middleware";
 import * as settingMiddleware from "../../middlewares/client/setting.middleware";
 import * as chatMiddleware from "../../middlewares/client/chat.middleware";
+import chatRoutes from "./chat.route";
 
 
 const router = Router();
@@ -38,6 +39,7 @@ router.use('/dashboard', authMiddleware.loggedIn, dashboardRoutes);
 router.use('/coupon', couponRoutes);
 router.use('/checkout', checkoutRoutes);
 router.use('/order', orderRoutes);
+router.use('/chat', chatRoutes);
 
 
 export default router;

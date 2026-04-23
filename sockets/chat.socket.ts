@@ -72,6 +72,7 @@ export const chatSocket = async (io: Server, socket: Socket) => {
 
     // Phản hồi về cho client trong đúng phòng chat đó
     io.to(chatRoom.id).emit('SERVER_SEND_MESSAGE', {
+       _id: newMessage.id,
       ...message
     });
   });
