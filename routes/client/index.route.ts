@@ -26,7 +26,7 @@ router.use(attributeMiddleware.getAttributeProduct);
 router.use(authMiddleware.verifyToken);
 router.use(seoMiddleware.canonical);
 router.use(settingMiddleware.assetVersion);
-router.use(chatMiddleware.getChatMessage);
+router.use(chatMiddleware.getChatMessageTotal);
 
 router.use('/', homeRoutes);
 router.use('/article', articleRoutes);
