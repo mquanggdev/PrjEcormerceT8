@@ -10,10 +10,12 @@ export const authSocket = (socket: Socket, next: any) => {
       
       let token: string = "";
       let role: string = "";
+      let roomId: string = "";
 
       if(cookieParsed.tokenAdmin) {
         token = cookieParsed.tokenAdmin;
         role = "admin";
+        roomId = `${socket.handshake.auth.roomId}`;
       } else if(cookieParsed.tokenUser) {
         token = cookieParsed.tokenUser;
         role = "user";
@@ -26,7 +28,8 @@ export const authSocket = (socket: Socket, next: any) => {
           socket.data.account = { // Khi giải mã token thì ta sẽ có thông tin người dùng và gán nó vào socket.data.account để có thể sử dụng thông tin này ở các socket khác
             id: decoded.id,
             email: decoded.email,
-            role: role
+            role: role,
+            roomId: roomId
           };
         }
       }

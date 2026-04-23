@@ -27,9 +27,12 @@ export const chatSocket = async (io: Server, socket: Socket) => {
     }
   }else if(account.role === 'admin') {
       chatRoom = await ChatRoom.findOne({
-      adminId: account.id
+      adminId: account.id ,
+      _id: account.roomId
     });
   }
+
+  socket.join(chatRoom.id); // cho socket vào phòng chat tương ứng với user đó
   
 
   // Lắng nghe sự kiện CLIENT_SEND_MESSAGE
@@ -67,8 +70,8 @@ export const chatSocket = async (io: Server, socket: Socket) => {
  
 
 
-    // Phản hồi về cho tất cả mọi người
-    io.emit('SERVER_SEND_MESSAGE', {
+    // Phản hồi về cho client trong đúng phòng chat đó
+    io.to(chatRoom.id).emit('SERVER_SEND_MESSAGE', {
       ...message
     });
   });
