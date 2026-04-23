@@ -16,6 +16,8 @@ import checkoutRoutes from "./checkout.route";
 import orderRoutes from "./order.route";
 import * as seoMiddleware from "../../middlewares/client/seo.middleware";
 import * as settingMiddleware from "../../middlewares/client/setting.middleware";
+import * as chatMiddleware from "../../middlewares/client/chat.middleware";
+
 
 const router = Router();
 router.use(categoryMiddleware.getAllCategory);
@@ -23,6 +25,7 @@ router.use(attributeMiddleware.getAttributeProduct);
 router.use(authMiddleware.verifyToken);
 router.use(seoMiddleware.canonical);
 router.use(settingMiddleware.assetVersion);
+router.use(chatMiddleware.getChatMessage);
 
 router.use('/', homeRoutes);
 router.use('/article', articleRoutes);
