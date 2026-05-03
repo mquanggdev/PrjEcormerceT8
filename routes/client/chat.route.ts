@@ -15,4 +15,6 @@ router.post(
   chatController.uploadPost
 );
 
+router.post('/rate', chatController.ratePost);
+
 export default router;
