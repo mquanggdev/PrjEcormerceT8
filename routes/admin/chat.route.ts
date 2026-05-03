@@ -28,5 +28,6 @@ router.post(
   chatController.uploadPost
 );
 
+router.patch('/change-status', chatController.changeStatusPatch);
 
 export default router;

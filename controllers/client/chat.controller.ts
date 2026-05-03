@@ -74,6 +74,19 @@ export const uploadPost = async (req: Request, res: Response) => {
       })
       return;
     }
+    
+    const chatRoomDetail = await ChatRoom.findOne({
+      userId: userId
+    });
+
+    if(chatRoomDetail?.status === "locked") {
+      res.json({
+        code: "error",
+        message: "Phòng chat bị khóa!"
+      })
+      return;
+    }
+
 
     const formData = new FormData();
     files.forEach(file => {
