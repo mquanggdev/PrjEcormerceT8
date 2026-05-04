@@ -15,6 +15,7 @@ import { configureFacebookPassport } from './configs/facebookOauth.config';
 import { Server } from 'socket.io';
 import { createServer } from 'node:http';
 import { initSocket } from './sockets/index.socket';
+import { startJobs } from './jobs/index.job';
 
 // Load biến môi trường
 dotenv.config();
@@ -82,6 +83,9 @@ app.use(`/${pathAdmin}`, adminRoutes);
 
 // Khởi tạo Socket bên Server
 initSocket(io);
+// Gọi job
+startJobs()
+
 
 server.listen(port, () => {
   console.log(`Website đang chạy trên cổng ${port}`);
