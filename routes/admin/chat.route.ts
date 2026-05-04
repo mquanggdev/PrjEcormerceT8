@@ -32,4 +32,7 @@ router.patch('/change-status', chatController.changeStatusPatch);
 
 router.get('/rate/:id', chatController.rate);
 
+
+router.get('/suggest-reply/:id', chatController.suggestReply);
+
 export default router;

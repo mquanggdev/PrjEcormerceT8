@@ -260,3 +260,68 @@ export const rate = async (req: Request, res: Response) => {
     res.redirect('/admin/dashboard');
   }
 }
+
+export const suggestReply = async (req: Request, res: Response) => {
+  try {
+    const roomId = req.params.id;
+
+    const messages = await ChatMessage.find({
+      roomId: roomId
+    })
+    .sort({
+      createdAt: "desc"
+    })
+    .limit(10)
+    .lean();
+
+    const string = messages
+      .reverse()
+      .map(item => {
+        return `${item.senderRole === "user" ? "Khách hàng" : "Admin"}: ${item.content}`;
+      })
+      .join("\n");
+
+    const prompt = `
+      Bạn là nhân viên chăm sóc khách hàng.
+
+      Đây là đoạn hội thoại giữa khách hàng và admin:
+
+      ${string}
+
+      Hãy gợi ý 3 câu trả lời ngắn gọn, lịch sự để admin trả lời khách hàng.
+      Viết bằng tiếng Việt.
+    `;
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
+      })
+    });
+    const data = await response.json();
+
+    const content = data.choices?.[0]?.message?.content || "";
+
+    res.json({
+      code: "success",
+      message: "Thành công!",
+      content: content
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}

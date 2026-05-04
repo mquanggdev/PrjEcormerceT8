@@ -327,4 +327,26 @@ if(formChat) {
     drawNotify("success", "Đã xóa phòng chat!");
     window.location.href = `/${pathAdmin}/chat/list/my-chat`;
   });
+
+  // AI Suggest Reply
+  const buttonAiSuggestReply = document.querySelector("#button-ai-suggest-reply");
+  const chatAiSuggestReply = document.querySelector("#chat-ai-suggest-reply");
+  if(buttonAiSuggestReply) {
+    buttonAiSuggestReply.addEventListener("click", async () => {
+      const res = await fetch(`/${pathAdmin}/chat/suggest-reply/${chatRoomId}`);
+      const data = await res.json();
+      if(data.code === "success") {
+        const boxContent = chatAiSuggestReply.querySelector(".inner-content");
+        boxContent.innerHTML = data.content;
+        chatAiSuggestReply.classList.remove("d-none");
+      }
+    });
+  }
+
+  // Đóng gợi ý
+  const buttonCloseAiSuggestReply = chatAiSuggestReply.querySelector(".inner-close");
+  buttonCloseAiSuggestReply.addEventListener("click", () => {
+    chatAiSuggestReply.classList.add("d-none");
+    boxContent.innerHTML = "";
+  });
 }
