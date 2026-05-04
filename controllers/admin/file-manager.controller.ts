@@ -93,7 +93,7 @@ export const uploadPost = async (req: Request, res: Response) => {
 
 
     const response = await axios.post(
-      "http://localhost:4000/file-manager/upload",
+      `${domainCDN}/file-manager/upload`,
       formData,
       {
         headers: {
