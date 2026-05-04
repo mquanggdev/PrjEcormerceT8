@@ -349,4 +349,29 @@ if(formChat) {
     chatAiSuggestReply.classList.add("d-none");
     boxContent.innerHTML = "";
   });
+
+  
+  // AI Edit Reply
+  const buttonAiEditReply = document.querySelector("#button-ai-edit-reply");
+  if(buttonAiEditReply) {
+    buttonAiEditReply.addEventListener("click", async () => {
+      const content = inputContent.value.trim();
+      const res = await fetch(`/${pathAdmin}/chat/edit-reply/${chatRoomId}`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          content: content
+        })
+      });
+      const data = await res.json();
+
+      if(data.code === "success") {
+        const boxContent = chatAiSuggestReply.querySelector(".inner-content");
+        boxContent.innerHTML = data.content;
+        chatAiSuggestReply.classList.remove("d-none");
+      }
+    });
+  }
 }

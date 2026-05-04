@@ -6,7 +6,8 @@ import ChatMessage from '../../models/chat-message.model';
 import { timeAgo } from '../../helpers/format.helper';
 import FormData from 'form-data';
 import axios from 'axios';
-import { domainCDN , pathAdmin  } from '../../configs/variable.config';
+import { domainCDN, pathAdmin } from '../../configs/variable.config';
+import { aiGenerateAnswer } from '../../helpers/ai.helper';
 
 export const myChatList = async (req: Request, res: Response) => {
   // Danh sách phòng chat
@@ -195,7 +196,6 @@ export const uploadPost = async (req: Request, res: Response) => {
   }
 }
 
-
 export const changeStatusPatch = async (req: Request, res: Response) => {
   try {
     const adminId = res.locals.accountAdmin.id;
@@ -232,6 +232,7 @@ export const changeStatusPatch = async (req: Request, res: Response) => {
     })
   }
 }
+
 export const rate = async (req: Request, res: Response) => {
   try {    
     // Chi tiết phòng chat
@@ -292,25 +293,57 @@ export const suggestReply = async (req: Request, res: Response) => {
       Viết bằng tiếng Việt.
     `;
 
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-      })
-    });
-    const data = await response.json();
+    const content = await aiGenerateAnswer(prompt);
 
-    const content = data.choices?.[0]?.message?.content || "";
+    res.json({
+      code: "success",
+      message: "Thành công!",
+      content: content
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!"
+    })
+  }
+}
+
+export const editReplyPost = async (req: Request, res: Response) => {
+  try {
+    const roomId = req.params.id;
+    const { content: contentChat } = req.body;
+
+    const messages = await ChatMessage.find({
+      roomId: roomId
+    })
+    .sort({
+      createdAt: "desc"
+    })
+    .limit(10)
+    .lean();
+
+    const string = messages
+      .reverse()
+      .map(item => {
+        return `${item.senderRole === "user" ? "Khách hàng" : "Admin"}: ${item.content}`;
+      })
+      .join("\n");
+
+    const prompt = `
+      Bạn là nhân viên chăm sóc khách hàng.
+
+      Đây là đoạn hội thoại giữa khách hàng và admin:
+
+      ${string}
+
+      Đây là câu trả lời admin đang soạn: ${contentChat}
+
+      Hãy sửa câu trả lời của admin đang soạn và gợi ý 3 câu trả lời hay hơn.
+      Viết bằng tiếng Việt.
+    `;
+
+    const content = await aiGenerateAnswer(prompt);
 
     res.json({
       code: "success",
