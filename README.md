@@ -90,4 +90,4 @@ Cơ chế Xóa Cache để tối ưu tốc độ tải trang sau khi cập nhậ
 Hệ thống tự động xóa hội thoại cũ sau 10 ngày để tối ưu dung lượng database.
 
 Author: Tran Minh Quang
-Role: Fullstack Developer (Node.js & Express
+Role: Fullstack Developer 
